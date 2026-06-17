@@ -1,0 +1,2166 @@
+# Goal Maker v2 state.yaml
+# Board truth lives here. goal.md is the editable charter; notes/ holds long receipts only.
+
+version: 2
+
+goal:
+  title: "Madowaku Codex Cockpit v0.1"
+  slug: "madowaku-codex-cockpit-v0-1"
+  kind: specific # specific | open_ended | recovery | audit
+  tranche: "Build the smallest lovable local-first cockpit shell: one selected project, one active task, localStorage persistence, note fields, status tracking, and copy-ready /goal-maker and /plan prompt generation."
+  status: active # active | blocked | done
+
+rules:
+  pm_owns_state: true
+  one_active_task: true
+  max_write_workers: 1
+  no_implementation_without_worker_or_pm_task: true
+  no_completion_without_judge_or_pm_audit: true
+  planning_is_not_completion: true
+  queued_required_worker_blocks_completion: true
+
+agents:
+  scout: installed
+  worker: installed
+  judge: installed
+
+active_task: T062
+
+tasks:
+  - id: T001
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Map the product intent, constraints, MVP boundary, and first implementation candidates from the owner brief."
+    inputs:
+      - "Owner brief in chat"
+    constraints:
+      - "Read-only."
+      - "Do not inspect or edit implementation files."
+      - "Do not start coding."
+      - "Prefer a small local-first v0.1 over general AI IDE scope."
+    expected_output:
+      - "Product spec"
+      - "MVP scope"
+      - "UX flow"
+      - "Risks and safety constraints"
+      - "Candidate first Worker tasks"
+    receipt:
+      result: done
+      summary: "Scout mapped the owner brief into a local-first cockpit product: project choice, rough goal capture, Codex prompt generation, Spec/Plan/Review/result note storage, next-action compression, and status tracking. v0.1 excludes cloud sync, login, billing, direct filesystem writes, shell execution, model calls, and Codex App Server integration."
+      evidence:
+        - "docs/goals/madowaku-codex-cockpit-v0-1/goal.md"
+      candidate_worker_tasks:
+        - "Scaffold a Vite + React + TypeScript app with the cockpit data model and static UI."
+        - "Implement localStorage persistence for projects and active task state."
+        - "Add copy-ready /goal-maker and /plan prompt generation from current fields."
+        - "Add responsive polish and manual browser verification."
+
+  - id: T002
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Review Scout findings and choose the first safe implementation task."
+    inputs:
+      - "T001 receipt"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/goal.md"
+    constraints:
+      - "Do not implement."
+      - "Pick work small enough for one focused session."
+      - "Avoid model integration, filesystem modification, cloud sync, auth, billing, and command execution."
+      - "Prefer Vite + React + TypeScript and localStorage."
+    expected_output:
+      - "Decision"
+      - "Exact Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+      - "Blocked or deferred tasks"
+    receipt:
+      result: done
+      decision: "Choose a single thin vertical slice: scaffold the local React cockpit and implement one-project/one-task persistence plus copy-ready prompt generation. This proves the core loop while keeping all risky integrations out of v0.1."
+      next_allowed_task: T003
+      exact_worker_objective: "Create the Vite + React + TypeScript cockpit shell with localStorage-backed project/task state, practical playful UI, status tracking, note fields, next-action field, and generated /goal-maker and /plan prompt text."
+      allowed_files:
+        - "package.json"
+        - "package-lock.json"
+        - "index.html"
+        - "vite.config.ts"
+        - "tsconfig.json"
+        - "tsconfig.node.json"
+        - "src/**"
+      verify:
+        - "npm run build"
+        - "Manual browser check: create/edit project task fields, refresh, confirm localStorage restore."
+        - "Manual browser check: generated /goal-maker and /plan prompts include current project, rough goal, status, notes, logs, and next action."
+      stop_if:
+        - "Need network dependency installation and owner approval is unavailable."
+        - "Need files outside allowed_files."
+        - "Need filesystem writes from inside the app."
+        - "Need cloud, auth, billing, command execution, or model integration."
+        - "Behavior becomes ambiguous enough to change the MVP boundary."
+      deferred_tasks:
+        - "Multiple tasks per project."
+        - "Export/import JSON backup."
+        - "Project workflow templates."
+        - "Optional local model summarization hook."
+        - "Codex App Server integration review."
+
+  - id: T003
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Create the Vite + React + TypeScript cockpit shell with localStorage-backed project/task state, practical playful UI, status tracking, note fields, next-action field, and generated /goal-maker and /plan prompt text."
+    inputs:
+      - "docs/goals/madowaku-codex-cockpit-v0-1/goal.md"
+      - "T002 receipt"
+    constraints:
+      - "Do not implement until the owner explicitly starts the next /goal or coding session."
+      - "Keep the app local-first and single-user."
+      - "No cloud sync, login, billing, filesystem writes from the app, shell execution, or model calls."
+      - "Keep scope small and lovable."
+      - "Do not build a landing page; first screen is the cockpit."
+    allowed_files:
+      - "package.json"
+      - "package-lock.json"
+      - "index.html"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - "tsconfig.node.json"
+      - "src/**"
+    verify:
+      - "npm run build"
+      - "Manual browser check: create/edit project task fields, refresh, confirm localStorage restore."
+      - "Manual browser check: generated /goal-maker and /plan prompts include current project, rough goal, status, notes, logs, and next action."
+    stop_if:
+      - "Need network dependency installation and owner approval is unavailable."
+      - "Need files outside allowed_files."
+      - "Need filesystem writes from inside the app."
+      - "Need cloud, auth, billing, command execution, or model integration."
+      - "Behavior becomes ambiguous enough to change the MVP boundary."
+    receipt:
+      result: done
+      changed_files:
+        - "package.json"
+        - "package-lock.json"
+        - "index.html"
+        - "vite.config.ts"
+        - "tsconfig.json"
+        - "tsconfig.node.json"
+        - "src/App.tsx"
+        - "src/main.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm install"
+          status: pass
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 1 file passed, 2 tests passed."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+        - cmd: "Playwright browser verification"
+          status: pass
+          summary: "Filled Project, Task, Rough Goal, Status, Spec, Plan, Review, Logs, and Next Action; refreshed; confirmed localStorage restore and generated /goal-maker and /plan prompt contents."
+      summary: "Built the small Vite + React + TypeScript local cockpit shell with localStorage-backed project/task state, editable workflow notes, status tracking, next action capture, and generated /goal-maker and /plan prompts. No model calls, filesystem access from the app, shell execution from the app, auth, sync, billing, or Codex App Server integration were added."
+
+  - id: T004
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: high
+    objective: "Audit whether the implemented slice satisfies the first tranche and remains inside the v0.1 safety boundary."
+    inputs:
+      - "T003 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/goal.md"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if required Worker work is still queued or active."
+      - "Reject completion if v0.1 added cloud sync, login, billing, filesystem writes from the app, shell execution, or model calls."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T003 satisfies the first tranche: the local-first Vite + React + TypeScript cockpit shell exists, persists project/task workflow fields with localStorage, generates /goal-maker and /plan prompts, and passed build plus browser verification. No v0.1 safety boundary violations were found in the receipt."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T005
+
+  - id: T005
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add a small template shelf and a copy-ready compression prompt generator while preserving local-first v0.1 constraints."
+    inputs:
+      - "Owner request: さらに便利に使いやすく私にとって最強ツールするならどんな風にしたらいいかな？"
+      - "Owner approval: いいね、進めて！"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the change small."
+      - "Do not add model calls."
+      - "Do not add filesystem access, shell execution from the app, auth, sync, or Codex App Server integration."
+      - "Use deterministic local prompt generation only."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need model calls, cloud sync, auth, shell execution, filesystem access, or Codex App Server integration."
+      - "The feature grows beyond template application and deterministic prompt generation."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 1 file passed, 4 tests passed."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added a small local template shelf for Goal Maker, Plan, and Review note scaffolds, plus a deterministic copy-ready compression prompt generated from project, task, goal, review notes, logs, and next action. No model calls, filesystem access from the app, shell execution from the app, auth, sync, or Codex App Server integration were added."
+
+  - id: T006
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether the template shelf and compression prompt polish remain small, local-first, and verified."
+    inputs:
+      - "T005 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the change added model calls, filesystem access from the app, shell execution from the app, auth, sync, or Codex App Server integration."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T005 is complete: it added a deterministic template shelf and compression prompt generator, stayed inside local-first v0.1 constraints, and has fresh npm test plus npm run build verification."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T007
+
+  - id: T007
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add manual JSON backup export/import for localStorage project data without cloud sync or hidden filesystem access."
+    inputs:
+      - "Earlier improvement candidate: JSONエクスポート/インポート"
+      - "src/App.tsx"
+    constraints:
+      - "Keep the change small."
+      - "User-initiated browser download/upload only."
+      - "No cloud sync, login, billing, model calls, shell execution from the app, or Codex App Server integration."
+      - "Do not read or write arbitrary filesystem paths from app code."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need cloud sync, auth, model calls, shell execution, arbitrary filesystem access, or Codex App Server integration."
+      - "Import validation becomes broad enough to require a schema library."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/backup.ts"
+        - "src/backup.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 6 tests passed."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added manual JSON backup export/import using user-initiated browser download/upload. Backup payloads are versioned and validated before restore. The app still has no cloud sync, login, billing, model calls, shell execution from the app, arbitrary filesystem access, or Codex App Server integration."
+
+  - id: T008
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add a tiny task mood/temperature field for daily workflow triage."
+    inputs:
+      - "Earlier improvement candidate: 作業の温度感"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the change small."
+      - "Store locally with existing project/task localStorage data."
+      - "Do not add cloud sync, auth, model calls, shell execution, filesystem access, or Codex App Server integration."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need migration complexity beyond a backward-compatible optional field."
+      - "Need cloud sync, auth, model calls, shell execution, filesystem access, or Codex App Server integration."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/backup.ts"
+        - "src/backup.test.ts"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 8 tests passed."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added an optional task mood/temperature field with choices 今日やる, 詰まり中, 寝かせる, and Codex待ち. The mood is persisted in existing localStorage project data, included in generated prompts, and validated in manual JSON backup restore."
+
+  - id: T009
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether the backup and task mood slices satisfy the current local-first polish tranche."
+    inputs:
+      - "T007 receipt"
+      - "T008 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if either slice violates local-first v0.1 safety constraints."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T007 and T008 satisfy the local-first polish tranche: manual backup/restore and task mood are implemented, verified, and do not add cloud sync, auth, model calls, shell execution from the app, arbitrary filesystem access, or Codex App Server integration."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T010
+
+  - id: T010
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add an AI-CREOLE context pack and handoff prompt that distills idea.md concepts into a small local-first Codex handoff surface."
+    inputs:
+      - "idea.md"
+      - "AI_CREOLE.md"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the change small and deterministic."
+      - "No model calls, cloud sync, auth, shell execution from the app, arbitrary filesystem access, or Codex App Server integration."
+      - "Use idea.md concepts as local prompt/workflow language only; do not integrate external tools yet."
+      - "Prefer token-saving context compression over adding large new UI surfaces."
+    allowed_files:
+      - "AI_CREOLE.md"
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need network installs or external tool integration."
+      - "Feature grows beyond a context-pack field, template, and generated handoff prompt."
+    receipt:
+      result: done
+      changed_files:
+        - "AI_CREOLE.md"
+        - "src/App.tsx"
+        - "src/backup.ts"
+        - "src/backup.test.ts"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 11 tests passed."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added a local context pack field, AI-CREOLE template, and AI-CREOLE handoff prompt using idea.md concepts: Loop Protocol, TRACE, REPLAY, GOLDEN, COMPRESS, and token-saving context-first handoff. Backup validation preserves optional contextPack. No external tool integration or model calls were added."
+
+  - id: T011
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether the idea.md AI-CREOLE/context-pack slice remains small, local-first, and token-saving."
+    inputs:
+      - "T010 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the slice added external tool integration, model calls, cloud sync, auth, shell execution from the app, or arbitrary filesystem access."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T010 is complete: it adds a context pack, AI-CREOLE handoff prompt, AI-CREOLE template, and AI_CREOLE.md vocabulary without external integrations or model calls. Fresh npm test and npm run build evidence exists."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T012
+
+  - id: T012
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add a deterministic TRACE reflection loop that turns pasted Codex logs into a compact context-pack update."
+    inputs:
+      - "Owner request: Codex結果をLOGSへ貼る→TRACE/CHECK/NEXTに圧縮→次の文脈パックへ反映"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the change small and local-first."
+      - "No model calls; generate deterministic local scaffolds only."
+      - "No cloud sync, auth, shell execution from the app, arbitrary filesystem access, or Codex App Server integration."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need model calls or external tool integration."
+      - "Feature grows beyond a generated TRACE block and apply-to-context-pack button."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 13 tests passed."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added a deterministic TRACE reflection loop: pasted Logs can be turned into a TRACE/CHECK/GOLDEN/NEXT/COMPRESS block, copied as a prompt panel, or applied into the next context pack without clearing logs. No model calls or external integrations were added."
+
+  - id: T013
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether the TRACE reflection loop completes the current context-compression tranche."
+    inputs:
+      - "T012 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the slice added model calls, external tool integration, cloud sync, auth, shell execution from the app, or arbitrary filesystem access."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T012 is complete: it adds deterministic TRACE reflection and apply-to-context-pack behavior, with npm test and npm run build passing. No model calls or external integrations were added. Owner requested the next context-compression tranche: T014-T017."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T014
+
+  - id: T014
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Avoid duplicate TRACE blocks when reflecting the same result into the context pack."
+    inputs:
+      - "Owner request: TRACE反映時に重複を避ける"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the change deterministic and local-first."
+      - "No model calls, cloud sync, auth, shell execution from the app, arbitrary filesystem access, or Codex App Server integration."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need model calls or external tool integration."
+      - "Duplicate detection requires fuzzy AI matching instead of deterministic local text comparison."
+    receipt:
+      result: done
+      changed_files:
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 14 tests passed. RED first showed duplicate TRACE count 2 before fix."
+      summary: "Added deterministic duplicate prevention for TRACE reflection. Applying the same TRACE block twice now leaves the context pack unchanged instead of appending a duplicate."
+
+  - id: T015
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Show a COMPRESS candidate when the context pack has too many TRACE blocks."
+    inputs:
+      - "Owner request: 文脈パック内のTRACEが増えすぎたらCOMPRESS候補を出す"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the change deterministic and local-first."
+      - "No model calls or external integration."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need model calls or external tool integration."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 15 tests passed. RED first failed because buildContextPackCompressCandidate was missing."
+      summary: "Added a deterministic COMPRESS candidate generator and a prompt-panel surface. When TRACE count reaches 3 or more, the candidate suggests replacing older TRACE blocks with a compact summary while preserving decisions, checks, GOLDEN cases, and NEXT."
+
+  - id: T016
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add an independent GOLDEN field for representative cases that must not break."
+    inputs:
+      - "Owner request: GOLDEN欄を独立させて壊してはいけない代表ケースを固定する"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+      - "src/backup.ts"
+    constraints:
+      - "Keep the change backward-compatible for localStorage and backups."
+      - "No model calls or external integration."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need migration complexity beyond an optional field."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/backup.ts"
+        - "src/backup.test.ts"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 17 tests passed. RED first showed TRACE ignored golden and backup accepted invalid golden values."
+      summary: "Added an independent GOLDEN field for representative cases that must not break. GOLDEN is shown in the UI, persisted through localStorage data, included in generated prompts, used by TRACE reflection, and validated during backup restore."
+
+  - id: T017
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Insert the latest TRACE summary automatically into the AI-CREOLE handoff prompt."
+    inputs:
+      - "Owner request: AI-CREOLE handoffに最新TRACE summaryを自動挿入する"
+      - "src/promptBuilders.ts"
+      - "src/App.tsx"
+    constraints:
+      - "Keep the change deterministic and local-first."
+      - "No model calls or external integration."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need model calls or external tool integration."
+    receipt:
+      result: done
+      changed_files:
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 18 tests passed. RED first showed AI-CREOLE handoff had no LATEST_TRACE section."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added a LATEST_TRACE section to the AI-CREOLE handoff prompt. The latest TRACE block from the context pack is now surfaced explicitly before LOOP/DO/CHECK/NEXT."
+
+  - id: T018
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T014-T017 complete the context-compression polish tranche and stay inside v0.1 boundaries."
+    inputs:
+      - "T014 receipt"
+      - "T015 receipt"
+      - "T016 receipt"
+      - "T017 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the tranche added model calls, cloud sync, auth, shell execution from the app, arbitrary filesystem access, or Codex App Server integration."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T014-T017 complete the requested context-compression polish: TRACE reflection deduplicates identical blocks, COMPRESS candidates appear for large TRACE packs, GOLDEN is independent, and AI-CREOLE handoff includes the latest TRACE. npm test and npm run build passed. No model calls, cloud sync, auth, shell execution from the app, arbitrary filesystem access, or Codex App Server integration were added."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T019
+
+  - id: T019
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Map low-risk external integration candidates for the next tranche without implementing them."
+    inputs:
+      - "Owner note: そろそろ外部連携も入れていいかも"
+      - "Current v0.1 safety constraints"
+      - "idea.md"
+      - "AI_CREOLE.md"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Read-only."
+      - "Do not add external integrations yet."
+      - "Prefer explicit user-triggered export/import or copy/paste workflows before hidden automation."
+      - "No secrets, auth, sync, app shell execution, model calls, or filesystem writes from the app without a later Judge decision."
+    expected_output:
+      - "External integration candidates ranked by usefulness, risk, and reversibility."
+      - "Recommended first integration tranche."
+      - "Safety gates and verification commands for that tranche."
+    receipt:
+      result: done
+      summary: "Scout found the safest first external tranche is connectionless handoff: GitHub Issue/PR markdown, Obsidian-compatible Markdown export, and local LLM prep prompt. This matches idea.md themes: GitHub as source of truth, local Markdown/Obsidian memory, and Gemma/Qwen-style summarization prep, while avoiding auth, tokens, sync, model calls, and app filesystem writes."
+      evidence:
+        - "idea.md lines mentioning GitHub Issue queue, Obsidian-compatible Markdown vault, local LLM/Gemma/Ollama prep"
+        - "AI_CREOLE.md Core Tags and Heuristic Learning Dialect"
+        - "src/promptBuilders.ts deterministic prompt generation"
+      ranked_candidates:
+        - "1. GitHub handoff Markdown: copy-ready Issue/PR body; low risk; no API."
+        - "2. Obsidian Markdown export: user-triggered browser download; low risk; no vault writes."
+        - "3. Local LLM prep prompt: copy-ready Gemma/Qwen summarization instruction; low risk; no model call."
+      recommended_first_tranche: T021
+
+  - id: T020
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Choose the first safe external-handoff Worker task."
+    inputs:
+      - "T019 receipt"
+      - "Current v0.1 safety constraints"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Do not implement."
+      - "Prefer copy/download handoff over direct service integration."
+      - "Reject auth, sync, secrets, model calls, shell execution, arbitrary filesystem writes, and Codex App Server integration."
+    expected_output:
+      - "Decision"
+      - "Exact Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+    receipt:
+      result: done
+      decision: "Implement a connectionless external handoff panel: deterministic builders for GitHub handoff Markdown, Obsidian Markdown export text, and local LLM prep prompt, plus UI copy/download buttons. Do not call GitHub, write into an Obsidian vault, invoke local LLMs, or add credentials/config."
+      next_allowed_task: T021
+      exact_worker_objective: "Add copy-ready GitHub handoff, Obsidian Markdown export, and local LLM prep prompt generation, with a user-triggered Markdown download button."
+      allowed_files:
+        - "src/**"
+        - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+      verify:
+        - "npm test"
+        - "npm run build"
+      stop_if:
+        - "Need GitHub API, auth, tokens, sync, secrets, model calls, shell execution from the app, arbitrary filesystem writes, or Codex App Server integration."
+        - "Need files outside allowed_files."
+        - "Feature grows beyond deterministic text generation and user-triggered browser download."
+
+  - id: T021
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add connectionless GitHub handoff, Obsidian Markdown export, and local LLM prep generation."
+    inputs:
+      - "Owner request: GitHub handoff、Obsidian/Markdown export、ローカルLLM下ごしらえを進めよう"
+      - "T019 receipt"
+      - "T020 receipt"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep v0.1 small and local-first."
+      - "No GitHub API calls, auth, tokens, sync, model calls, shell execution from the app, arbitrary filesystem writes, or Codex App Server integration."
+      - "Obsidian export must be a user-triggered browser download only, not direct vault writing."
+      - "Local LLM prep must generate text only, not invoke a model."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need external credentials, model runtime, direct vault writes, or service APIs."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 21 tests passed. RED first showed the three new builders were missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added connectionless external handoff support: copy-ready GitHub handoff Markdown, Obsidian-compatible Markdown export text, a Local LLM prep prompt, and a user-triggered Markdown download button. No GitHub API, auth, tokens, sync, model calls, app shell execution, arbitrary filesystem writes, or Codex App Server integration were added."
+
+  - id: T022
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T021 safely advances external handoff without violating v0.1 local-first constraints."
+    inputs:
+      - "T021 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the tranche added service APIs, auth, sync, model calls, shell execution from the app, arbitrary filesystem writes, or Codex App Server integration."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T021 safely completes the first external-handoff tranche. It creates outbound text/download artifacts for GitHub, Obsidian Markdown, and local LLM prep while preserving local-first boundaries. npm test and npm run build passed. No prohibited external integration was added."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T023
+
+  - id: T023
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Map the next step from connectionless handoff toward optional real integrations."
+    inputs:
+      - "T021 receipt"
+      - "Owner interest in external integration"
+      - "GitHub handoff"
+      - "Obsidian/Markdown export"
+      - "Local LLM prep"
+      - "Updated idea.md"
+    constraints:
+      - "Read-only."
+      - "Do not implement API calls, auth, vault writes, or model invocation yet."
+      - "Rank next integration options by safety, setup cost, reversibility, and daily usefulness."
+    expected_output:
+      - "Recommended next integration if any."
+      - "Required approvals/secrets/setup."
+      - "Smallest safe Worker task."
+    receipt:
+      result: done
+      summary: "Updated idea.md points toward a safer next step than direct APIs: create a typed HandoffPacket boundary and a Madowaku Scout/Adopt prompt. This absorbs Raycast-style typed boundaries, Sea Agent discovery loops, Hermes/Ollama/Codex handoff ideas, and cockpit-tools-inspired multi-AI visibility without credentials, account management, vault writes, or model invocation."
+      evidence:
+        - "idea.md: DISCOVER / SCOUT / MAP / PROPOSE / ADOPT loop"
+        - "idea.md: Hermes / Ollama / Codex handoff packet idea"
+        - "idea.md: cockpit-tools should inspire dashboards but not token/account management"
+        - "src/promptBuilders.ts existing deterministic handoff builders"
+      recommended_next_integration: "Connectionless typed HandoffPacket plus Madowaku Scout/Adopt prompt."
+      deferred:
+        - "GitHub API integration until token handling is designed."
+        - "Obsidian vault direct writes until File System Access UX and browser support are reviewed."
+        - "Ollama/Hermes automatic invocation until local runtime, CORS, and failure handling are designed."
+
+  - id: T024
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Choose the next safe Worker task from updated idea.md."
+    inputs:
+      - "T023 receipt"
+      - "Updated idea.md"
+      - "src/promptBuilders.ts"
+      - "src/App.tsx"
+    constraints:
+      - "Do not implement."
+      - "Prefer connectionless prompt/export surfaces over real external APIs."
+      - "Avoid broad architecture refactors."
+    expected_output:
+      - "Decision"
+      - "Exact Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+    receipt:
+      result: done
+      decision: "Implement a small typed packet layer and Madowaku Scout/Adopt prompt. Add a HandoffPacket type/builder, a generated JSON packet panel, and a generated scout/adopt prompt panel. Extend AI_CREOLE.md with discovery intake dialect terms. Do not refactor all existing builders yet."
+      next_allowed_task: T025
+      allowed_files:
+        - "AI_CREOLE.md"
+        - "src/**"
+        - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+      verify:
+        - "npm test"
+        - "npm run build"
+      stop_if:
+        - "Need external API calls, auth, tokens, sync, direct vault writes, shell execution from the app, model calls, or Codex App Server integration."
+        - "Need broad refactor of existing handoff builders."
+        - "Need files outside allowed_files."
+
+  - id: T025
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add a typed HandoffPacket and Madowaku Scout/Adopt prompt generated from the current project/task."
+    inputs:
+      - "Updated idea.md"
+      - "T023 receipt"
+      - "T024 receipt"
+      - "AI_CREOLE.md"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the change small and deterministic."
+      - "No external API calls, auth, tokens, sync, direct vault writes, shell execution from the app, model calls, or Codex App Server integration."
+      - "Do not refactor all existing builders into the packet yet."
+    allowed_files:
+      - "AI_CREOLE.md"
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need external runtime or credentials."
+      - "Feature grows beyond packet JSON and scout/adopt prompt generation."
+    receipt:
+      result: done
+      changed_files:
+        - "AI_CREOLE.md"
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 24 tests passed. RED first showed HandoffPacket and Scout/Adopt builders were missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added a typed HandoffPacket model and stable JSON builder, plus a Madowaku Scout/Adopt prompt that turns new tools or ideas into DISCOVER/SCOUT/MAP/PROPOSE/ADOPT output. Added UI panels for HandoffPacket JSON and Madowaku Scout/Adopt. Extended AI_CREOLE.md with the Discovery Intake dialect. No external APIs, auth, sync, direct vault writes, model calls, shell execution from the app, or Codex App Server integration were added."
+
+  - id: T026
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T025 safely incorporates updated idea.md into madowaku cockpit."
+    inputs:
+      - "T025 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the tranche added external runtime dependencies or direct integrations."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T025 safely incorporates the useful parts of updated idea.md: typed handoff boundary, discovery intake dialect, and Scout/Adopt generation. The change remains connectionless and deterministic, and npm test plus npm run build passed."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T027
+
+  - id: T027
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Scout whether the next safe slice should be AI Workbench Dashboard, Hermes/Ollama/Codex markdown handoffs, or memory-vault export refinement."
+    inputs:
+      - "Updated idea.md"
+      - "T025 receipt"
+      - "Current app UI"
+      - "Owner priority order: Dashboard, Hermes/Ollama/Codex handoffs, memory-vault export refinement"
+    constraints:
+      - "Read-only."
+      - "Do not implement."
+      - "Rank by daily usefulness, safety, and ability to stay connectionless."
+    expected_output:
+      - "Recommended next Worker task."
+      - "Deferred risky integrations."
+      - "allowed_files and verification commands."
+    receipt:
+      result: done
+      summary: "Scout accepts the owner priority order. The safest next slice is an AI Workbench Dashboard that visualizes current connectionless surfaces: HandoffPacket, Madowaku Scout, Codex, Local LLM, GitHub, and Obsidian. Hermes/Ollama/Codex markdown handoffs should come after the dashboard makes target state visible. Memory-vault export refinement should wait until more handoff/memory content exists."
+      evidence:
+        - "Owner priority order in chat"
+        - "src/App.tsx prompt panel and local field structure"
+        - "src/promptBuilders.ts HandoffPacket and connectionless builders"
+      recommended_next_worker: T029
+      deferred:
+        - "Hermes/Ollama/Codex target-specific Markdown templates until dashboard lanes exist."
+        - "Memory-vault export refinement until dashboard and more content types are visible."
+      allowed_files:
+        - "src/**"
+        - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+      verify:
+        - "npm test"
+        - "npm run build"
+
+  - id: T028
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Choose the first Worker task for the owner-ordered dashboard/handoff/memory sequence."
+    inputs:
+      - "T027 receipt"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Do not implement."
+      - "Keep the first slice connectionless and visible."
+      - "Do not add new persistence, APIs, auth, direct filesystem writes, or model calls."
+    expected_output:
+      - "Decision"
+      - "Exact Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+    receipt:
+      result: done
+      decision: "Implement a small AI Workbench Dashboard section derived from existing local fields and generated handoff surfaces. It should show HandoffPacket, Scout, Codex, Local LLM, GitHub, and Obsidian lanes with STATE/CHECK/NEXT. Do not add real integrations or new persistence."
+      next_allowed_task: T029
+      allowed_files:
+        - "src/**"
+        - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+      verify:
+        - "npm test"
+        - "npm run build"
+      stop_if:
+        - "Need external API calls, auth, tokens, sync, direct vault writes, shell execution from the app, model calls, or Codex App Server integration."
+        - "Need new data persistence schema beyond derived dashboard state."
+        - "Need files outside allowed_files."
+
+  - id: T029
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add an AI Workbench Dashboard that visualizes connectionless HandoffPacket, Scout, Codex, Local LLM, GitHub, and Obsidian states."
+    inputs:
+      - "Owner priority order"
+      - "T027 receipt"
+      - "T028 receipt"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the UI compact and practical."
+      - "Derive dashboard state from existing local project/task fields."
+      - "No external API calls, auth, tokens, sync, direct vault writes, shell execution from the app, model calls, or Codex App Server integration."
+      - "No new persistence schema for this slice."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need files outside allowed_files."
+      - "Need direct external integrations."
+      - "Feature grows beyond a derived dashboard display."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 25 tests passed. RED first showed buildWorkbenchDashboard was missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added a compact AI Workbench Dashboard with six derived connectionless lanes: HandoffPacket, Madowaku Scout, Codex, Local LLM, GitHub, and Obsidian. Each lane shows STATE, CHECK, NEXT, and the current handoff surface. No external APIs, auth, sync, direct vault writes, shell execution from the app, model calls, Codex App Server integration, or new persistence schema were added."
+
+  - id: T030
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T029 completes the AI Workbench Dashboard slice and enables the owner ordered next step."
+    inputs:
+      - "T029 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if dashboard added direct integrations or new persistence."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T029 completes the requested first priority: the dashboard now makes HandoffPacket / Scout / Codex / Local LLM / GitHub / Obsidian state visible using derived local data. Verification passed and no prohibited integration was added. Proceed to the owner second priority: Hermes/Ollama/Codex markdown handoffs."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T031
+
+  - id: T031
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add connectionless Hermes/Ollama/Codex markdown handoff templates now that dashboard lanes are visible."
+    inputs:
+      - "Owner priority order item 2"
+      - "T029 receipt"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep templates deterministic and copy-ready."
+      - "No Hermes, Ollama, or Codex CLI execution from the app."
+      - "No external API calls, auth, tokens, sync, direct vault writes, shell execution from the app, model calls, or Codex App Server integration."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need direct runtime invocation or credentials."
+      - "Need files outside allowed_files."
+      - "Feature grows beyond markdown handoff templates and prompt panels."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 28 tests passed. RED first showed Hermes/Ollama/Codex markdown builders were missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added connectionless Hermes Agent, Ollama review, and Codex OSS Markdown handoffs as copy-ready prompt panels. They embed existing HandoffPacket or Local LLM context and explicitly forbid automatic tool execution, file modification, git push, deploy, hidden services, auth, sync, or direct vault writes."
+
+  - id: T032
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T031 completes the second owner priority and safely enables memory-vault refinement."
+    inputs:
+      - "T031 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the slice executes external runtimes or stores credentials."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T031 completes the second owner priority with connectionless Hermes/Ollama/Codex markdown handoffs. Verification passed and no runtime invocation or credentials were added. Proceed to memory-vault export refinement."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T033
+
+  - id: T033
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Refine memory-vault Markdown export for storage, compression, and reuse after dashboard and handoff content increased."
+    inputs:
+      - "Owner priority order item 3"
+      - "T029 receipt"
+      - "T031 receipt"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep export deterministic and user-triggered."
+      - "No direct vault writes, sync, external APIs, auth, shell execution from the app, model calls, or Codex App Server integration."
+      - "No new persistence schema for this slice."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need direct vault writes or external runtime."
+      - "Need files outside allowed_files."
+      - "Feature grows beyond markdown export refinement and prompt panel/download button."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 29 tests passed. RED first showed memory-vault export builder was missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added a Memory Vault Markdown export with schema/frontmatter, reuse index, compression notes, GOLDEN, latest TRACE, logs, next action, and embedded HandoffPacket JSON. Added a Memory Vault prompt panel and a user-triggered Memory書き出し download button. No direct vault writes, sync, external APIs, auth, shell execution from the app, model calls, Codex App Server integration, or new persistence schema were added."
+
+  - id: T034
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether the owner ordered dashboard/handoff/memory sequence is complete and still connectionless."
+    inputs:
+      - "T029 receipt"
+      - "T031 receipt"
+      - "T033 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if any task added APIs, auth, sync, direct vault writes, model calls, shell execution from the app, or Codex App Server integration."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "The owner ordered sequence is complete: AI Workbench Dashboard, Hermes/Ollama/Codex markdown handoffs, and Memory Vault export refinement are implemented and verified. All additions are deterministic copy/download surfaces derived from local fields. No prohibited integration was added."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T035
+
+  - id: T035
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Scout whether Freebuff should be incorporated into madowaku-cockpit after the owner shared the Freebuff README."
+    inputs:
+      - "Owner URL: https://github.com/CodebuffAI/codebuff/blob/main/freebuff/README.md"
+      - "Freebuff README"
+      - "Current handoff/dashboard implementation"
+    constraints:
+      - "Read-only."
+      - "Do not add runtime invocation, install flow, account handling, ads, cloud sync, model calls, or shell execution from the app."
+      - "Separate useful handoff patterns from risky direct integration."
+    expected_output:
+      - "Adopt proposal"
+      - "Deferred risks"
+      - "Smallest safe Worker task"
+    receipt:
+      result: done
+      summary: "Freebuff has useful cockpit-compatible patterns: @file mentions, knowledge.md as stable project context, simple terminal-agent handoff, and conversation continuity. Direct integration is not v0.1-safe because the README describes a terminal agent that edits code, can use bash mode, connects to a cloud backend, and may require sign-in/availability constraints. The safe adoption step is a copy-ready Freebuff Markdown handoff plus a dashboard lane, with explicit no-/bash/no-!commands/no-install/no-secrets guardrails."
+      evidence:
+        - "README: file mentions use @filename."
+        - "README: knowledge.md can provide project context."
+        - "README: bash mode supports !command or /bash, so the cockpit handoff must forbid automatic command execution."
+        - "README: Freebuff connects to a cloud backend, so v0.1 should avoid direct integration."
+      recommended_next_worker: T037
+      deferred:
+        - "Launching Freebuff from the app."
+        - "Installing or configuring the CLI."
+        - "Account/session handling."
+        - "Automatic command execution or shell mode."
+        - "Any hidden external backend use from the cockpit."
+
+  - id: T036
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Choose the safe Freebuff adoption slice from T035."
+    inputs:
+      - "T035 receipt"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Do not implement."
+      - "Prefer copy-only handoff over direct CLI integration."
+      - "Keep the change small and reversible."
+    expected_output:
+      - "Decision"
+      - "Exact Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+    receipt:
+      result: done
+      decision: "Implement a copy-ready Freebuff Markdown handoff builder and prompt panel, plus a derived Freebuff dashboard lane. Extract simple @file mentions from context pack READ entries when possible. Do not launch Freebuff, install dependencies, run commands, connect to cloud services, or modify persistence."
+      next_allowed_task: T037
+      allowed_files:
+        - "src/**"
+        - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+      verify:
+        - "npm test"
+        - "npm run build"
+      stop_if:
+        - "Need runtime invocation, install flow, auth/session handling, ads/cloud backend integration, model calls, shell execution from the app, or filesystem writes from the app."
+        - "Need files outside allowed_files."
+
+  - id: T037
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add a copy-ready Freebuff Markdown handoff and dashboard lane using @file mentions and knowledge.md guidance, without invoking Freebuff."
+    inputs:
+      - "T035 receipt"
+      - "T036 receipt"
+      - "Freebuff README"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep the feature deterministic and copy-only."
+      - "No CLI launch, install flow, shell execution from the app, auth, sync, model calls, direct filesystem writes, or hidden backend use."
+      - "No new persistence schema."
+    allowed_files:
+      - "src/**"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+    stop_if:
+      - "Need direct Freebuff runtime integration."
+      - "Need files outside allowed_files."
+      - "Feature grows beyond markdown handoff generation and derived dashboard display."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 30 tests passed. RED first showed the Freebuff dashboard lane and builder were missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added a Freebuff dashboard lane and a copy-ready Freebuff handoff prompt panel. The handoff extracts @file mentions from context pack READ-style lines, references knowledge.md as stable project memory, embeds the current HandoffPacket, and explicitly forbids /bash, !commands, sign-in, sync, deploy, push, installs, or secrets unless madowaku explicitly approves. No Freebuff CLI invocation, install flow, backend integration, model calls, shell execution from the app, direct filesystem writes, or new persistence schema were added."
+
+  - id: T038
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Scout the next small safe improvement after dashboard, handoff templates, memory-vault export, and Freebuff handoff are verified."
+    inputs:
+      - "T034 receipt"
+      - "T037 receipt"
+      - "Current cockpit UI"
+      - "Owner request: Handoff Runbook / Preset Flow layer"
+    constraints:
+      - "Read-only until the owner asks for the next implementation slice."
+      - "Do not implement."
+      - "Keep v0.1 local-first unless a later tranche explicitly approves a real connector design."
+    expected_output:
+      - "Recommended next Worker task"
+      - "Risks"
+      - "Verification strategy"
+    receipt:
+      result: done
+      summary: "The next safe improvement is a small Handoff Runbook / Preset Flow layer. The UI already exposes many generated outputs, so the highest leverage is grouping existing panels into copy-only task flows instead of adding another integration. Keep the layer derived from current project/task state and existing builders."
+      evidence:
+        - "src/App.tsx: AI Workbench Dashboard and prompt dock already exist."
+        - "src/promptBuilders.ts: existing HandoffPacket and markdown handoff builders."
+        - "Owner CREOLE task request with explicit NO and CHECK guardrails."
+      recommended_next_worker: T040
+      risks:
+        - "UI clutter if presets duplicate the dashboard."
+        - "Runbook language could imply fake automation."
+        - "Too many choices could overwhelm daily use."
+
+  - id: T039
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Choose the safe implementation slice for Handoff Runbook / Preset Flow."
+    inputs:
+      - "T038 receipt"
+      - "Owner CREOLE task request"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Do not implement."
+      - "Preserve all existing outputs."
+      - "No new integrations, CLI execution, external APIs, account/token handling, dependency additions, or broad UI refactor."
+    expected_output:
+      - "Decision"
+      - "Exact Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+    receipt:
+      result: done
+      decision: "Implement one derived runbook preset builder plus a compact UI panel between the dashboard and raw output panels. Include six presets: Codex implementation, Scout idea, Local LLM review, Memory Vault save, GitHub handoff, and Obsidian capture. Add tests for builder output."
+      next_allowed_task: T040
+      allowed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+        - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+      verify:
+        - "npm test"
+        - "npm run build"
+        - "Goal Maker checker"
+      stop_if:
+        - "Need external API calls, CLI execution, auth, sync, account/token handling, model calls, direct filesystem writes from the app, or dependency additions."
+        - "Need broad UI refactor or removal of existing outputs."
+
+  - id: T040
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add a small copy-only Handoff Runbook / Preset Flow panel that groups existing handoff outputs into safe daily flows."
+    inputs:
+      - "T038 receipt"
+      - "T039 receipt"
+      - "Owner CREOLE task request"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep it local-only and copy-only."
+      - "Do not remove existing outputs."
+      - "Reuse existing prompt builders and HandoffPacket fields."
+      - "No new integrations, CLI execution, external APIs, token/account handling, dependency additions, or broad UI refactor."
+    allowed_files:
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+      - "src/promptBuilders.test.ts"
+      - "src/styles.css"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+      - "Goal Maker checker"
+    stop_if:
+      - "Need prohibited integration or runtime invocation."
+      - "Need files outside allowed_files."
+      - "Feature grows beyond derived runbook guidance."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 31 tests passed. RED first showed buildHandoffRunbookPresets was missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added buildHandoffRunbookPresets with six copy-only flows: Codex implementation handoff, Scout new tool / idea, Local LLM review, Memory Vault save, GitHub issue / PR handoff, and Obsidian note capture. Added a compact Runbook Presets UI panel that shows purpose, recommended output panels, minimal order of use, and safety note. Existing dashboard and prompt outputs remain in place. No external integrations, CLI execution, auth/token handling, dependency additions, model calls, sync, or broad UI refactor were added."
+
+  - id: T041
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T040 satisfies the runbook preset request and preserves local-first safety."
+    inputs:
+      - "T040 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if the runbook implies automation or adds prohibited integrations."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T040 satisfies the runbook preset request: it groups existing outputs into six safe daily flows, stays derived/local/copy-only, preserves existing outputs, and has fresh npm test and npm run build evidence. No prohibited integration or fake automation was added."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T042
+
+  - id: T042
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Scout the next requested improvement: refine Memory Vault reuse index and add a small latest useful packet recall surface."
+    inputs:
+      - "T040 receipt"
+      - "Owner NEXT from CREOLE request"
+      - "Current Memory Vault export"
+      - "Current HandoffPacket JSON"
+    constraints:
+      - "Read-only until the next implementation request."
+      - "Do not implement."
+      - "Keep v0.1 local-first and avoid new persistence unless explicitly bounded."
+    expected_output:
+      - "Recommended next Worker task"
+      - "Risks"
+      - "Verification strategy"
+    receipt:
+      result: done
+      summary: "The safe implementation is a derived latest useful packet recall surface: summarize current HandoffPacket, latest TRACE, GOLDEN, and NEXT into one copyable compact packet. Also add one Memory Vault reuse-index line pointing back to this recall surface. Avoid persistent packet history for now because that would require a new bounded data model and retention UX."
+      evidence:
+        - "src/promptBuilders.ts: HandoffPacket, latestTraceBlock, Memory Vault export, and runbook presets already exist."
+        - "src/App.tsx: dashboard and runbook have a natural location before backup/export controls."
+        - "Owner request: latest useful packet recall implementation."
+      recommended_next_worker: T044
+      risks:
+        - "Recall surface could become another large prompt panel if it shows full JSON inline."
+        - "Adding packet history would need clear localStorage retention and deletion behavior."
+
+  - id: T043
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Choose the safe implementation slice for latest useful packet recall."
+    inputs:
+      - "T042 receipt"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Do not implement."
+      - "Keep the feature derived, local-only, and copy-only."
+      - "Do not add new persistence unless explicitly bounded."
+    expected_output:
+      - "Decision"
+      - "Exact Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+    receipt:
+      result: done
+      decision: "Implement a derived Latest Useful Packet builder and a compact UI card with a copy button. The card should show summary, source panels, latest TRACE, GOLDEN, and NEXT while copying the full compact packet text with embedded HandoffPacket JSON. Add one Memory Vault Reuse Index line."
+      next_allowed_task: T044
+      allowed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+        - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+      verify:
+        - "npm test"
+        - "npm run build"
+        - "Goal Maker checker"
+        - "Browser smoke check"
+      stop_if:
+        - "Need new integrations, CLI execution, auth, sync, model calls, hidden filesystem writes, dependency additions, or persistent packet history."
+        - "Need broad UI refactor."
+
+  - id: T044
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add a small Latest Useful Packet recall surface derived from current HandoffPacket, latest TRACE, GOLDEN, and NEXT."
+    inputs:
+      - "T042 receipt"
+      - "T043 receipt"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep it local-only, derived, and copy-only."
+      - "Do not add persistent packet history."
+      - "Do not remove existing outputs."
+      - "No new integrations, CLI execution, auth, sync, model calls, dependency additions, or broad UI refactor."
+    allowed_files:
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+      - "src/promptBuilders.test.ts"
+      - "src/styles.css"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+      - "Goal Maker checker"
+      - "Browser smoke check"
+    stop_if:
+      - "Need prohibited integration or new persistent packet history."
+      - "Need files outside allowed_files."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 32 tests passed. RED first showed buildLatestUsefulPacketRecall was missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+      summary: "Added buildLatestUsefulPacketRecall and a compact Latest Useful Packet UI surface. It displays summary, source panels, latest TRACE, GOLDEN, and NEXT, and copies a compact packet containing those fields plus embedded HandoffPacket JSON. Memory Vault Reuse Index now points to the recall surface. No persistent history, integrations, CLI execution, auth, sync, model calls, dependency additions, or broad UI refactor were added."
+
+  - id: T045
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T044 satisfies latest useful packet recall and preserves v0.1 boundaries."
+    inputs:
+      - "T044 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if recall added persistent history or any prohibited integration."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T044 satisfies the latest useful packet recall request. The feature is derived from current local fields, copy-only, compact, and verified with npm test and npm run build. It avoids persistent history and prohibited integrations."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T046
+
+  - id: T046
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Scout whether the next slice should add bounded packet history, stronger Memory Vault reuse formatting, or UI decluttering."
+    inputs:
+      - "T044 receipt"
+      - "Current cockpit UI"
+      - "Owner request: Focus Mode / Today View"
+    constraints:
+      - "Read-only until the next implementation request."
+      - "Do not implement."
+      - "Keep v0.1 local-first and small."
+    expected_output:
+      - "Recommended next Worker task"
+      - "Risks"
+      - "Verification strategy"
+    receipt:
+      result: done
+      summary: "The owner chose UI decluttering before bounded packet history. The safe slice is a local-only Focus Mode / Today View that uses existing Runbook preset metadata to visually prioritize relevant sections and prompt panels while keeping all outputs available."
+      evidence:
+        - "src/App.tsx: dashboard, runbook, latest packet, and prompt dock are all visible."
+        - "src/promptBuilders.ts: runbook preset data already maps flows to panels."
+        - "Owner CREOLE request lists six focus modes and manual verification checks."
+      recommended_next_worker: T048
+      risks:
+        - "Focus mode may feel like hiding information if muted panels are too subtle."
+        - "Focus metadata can drift from runbook presets if not tested."
+
+  - id: T047
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Choose the safe implementation slice for Focus Mode / Today View."
+    inputs:
+      - "T046 receipt"
+      - "Owner CREOLE request"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Do not implement."
+      - "No deleting outputs, new integrations, dependency additions, automatic execution, or broad refactor."
+      - "Keep hidden/de-emphasized panels accessible."
+    expected_output:
+      - "Decision"
+      - "Exact Worker objective"
+      - "allowed_files"
+      - "verify"
+      - "stop_if"
+    receipt:
+      result: done
+      decision: "Add Focus Mode metadata derived from runbook presets plus a small segmented Today View control. Use visual priority/muted classes for sections and prompt panels. Do not remove panels or persist complex layout state."
+      next_allowed_task: T060
+      allowed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+        - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+      verify:
+        - "npm test"
+        - "npm run build"
+        - "Goal Maker checker"
+        - "Playwright Today Workline smoke check"
+      stop_if:
+        - "Need deletion of outputs, persistent complex layout, drag/drop dashboard, dependency additions, new integrations, or automatic execution."
+        - "Need files outside allowed_files."
+
+  - id: T048
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Add Focus Mode / Today View to visually prioritize relevant handoff panels for the selected task flow while keeping all panels accessible."
+    inputs:
+      - "T046 receipt"
+      - "T047 receipt"
+      - "Owner CREOLE request"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep behavior local-only and copy-only."
+      - "Do not remove existing generated outputs."
+      - "Reuse existing Runbook preset data where possible."
+      - "No persistent complex layout system, drag/drop dashboard, new dependencies, external integrations, or automatic execution."
+    allowed_files:
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+      - "src/promptBuilders.test.ts"
+      - "src/styles.css"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+      - "Goal Maker checker"
+      - "Playwright Today Workline smoke check"
+    stop_if:
+      - "Need prohibited integration, dependency, or broad refactor."
+      - "Need files outside allowed_files."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 33 tests passed. RED first showed buildFocusModes was missing."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+        - cmd: "Playwright/manual Focus Mode checks"
+          status: pass
+          summary: "Overview prioritized AI Workbench, Runbook, and Latest Useful Packet; Codex highlighted HandoffPacket, AI-CREOLE, Codex OSS, and GitHub; Scout highlighted Scout/Adopt and HandoffPacket; Memory save highlighted Memory Vault, TRACE, COMPRESS, and Latest Useful Packet; All panels had zero muted prompt panels."
+      summary: "Added Focus Mode / Today View with six choices: Overview, Codex handoff, Scout/adopt, Local review, Memory save, and All panels. Focus metadata is tested and uses runbook preset data where practical. The UI visually prioritizes recommended sections and prompt panels with focus-priority classes and leaves other panels visible but muted. Existing outputs remain accessible and no integrations, dependencies, automatic execution, or persistent complex layout system were added."
+
+  - id: T049
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T048 satisfies Focus Mode / Today View and preserves v0.1 boundaries."
+    inputs:
+      - "T048 receipt"
+      - "Last verification"
+      - "Current dirty diff"
+    constraints:
+      - "Do not implement."
+      - "Reject completion if outputs were removed or Focus Mode implies automation."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+      - "next task if not complete"
+    receipt:
+      result: done
+      decision: "T048 satisfies the Focus Mode / Today View request. It keeps all outputs available, uses local UI state only, visually prioritizes relevant panels, and passed npm test, npm run build, Goal Maker checker, and Playwright/manual focus checks. No prohibited integration or fake automation was added."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T050
+
+  - id: T050
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Scout bounded packet history with a small maximum count and stale warnings after Focus Mode."
+    inputs:
+      - "T048 receipt"
+      - "Owner NEXT: bounded history"
+      - "Current Latest Useful Packet recall"
+      - "Current localStorage model"
+    constraints:
+      - "Read-only until the next implementation request."
+      - "Do not implement."
+      - "Keep history bounded, local-only, and easy to clear if adopted."
+    expected_output:
+      - "Recommended next Worker task"
+      - "Data model risk"
+      - "Verification strategy"
+    receipt:
+      result: done
+      summary: "Bounded Packet History is worth adopting as the next small reuse step because it turns Latest Useful Packet into a continuing work line without external integration."
+      evidence:
+        - "Latest Useful Packet already centralizes HandoffPacket / TRACE / GOLDEN / NEXT."
+        - "localStorage and JSON backup/restore already exist, so a small project-level array fits the current model."
+      recommendation: "Adopt a tiny project-level packetHistory array, capped at 5 entries, with manual save/clear controls, stale warning after 7 days, and backup/restore validation."
+      data_model_risk: "History can become another memory pile if unbounded or auto-saved; keep it bounded and manually captured."
+      verification_strategy: "TDD for bounded trim, stale detection, backup validation, then browser smoke for save cap and clear."
+      next_allowed_task: T060
+
+  - id: T051
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Decide whether bounded packet history is safe for v0.1."
+    inputs:
+      - "T050 receipt"
+      - "Current local-first constraints"
+    constraints:
+      - "Do not implement."
+      - "Reject if history implies sync, accounts, auto execution, or direct filesystem writes."
+    expected_output:
+      - "approved | rejected"
+      - "bounded Worker scope"
+    receipt:
+      result: done
+      decision: approved
+      bounded_worker_scope: "Add localStorage-backed project packetHistory with max 5 entries, stale badge, copy action, clear action, backup/restore validation, and no external integration."
+      next_allowed_task: T060
+
+  - id: T052
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Implement bounded Packet History for Latest Useful Packet recall."
+    inputs:
+      - "T050 Scout recommendation"
+      - "T051 Judge approval"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+      - "src/backup.ts"
+    constraints:
+      - "Keep local-only and copy-only."
+      - "No external API calls, model calls, shell execution, auth, sync, direct filesystem access, or Codex App Server integration."
+      - "No broad UI refactor or dependency additions."
+    allowed_files:
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+      - "src/promptBuilders.test.ts"
+      - "src/backup.ts"
+      - "src/backup.test.ts"
+      - "src/styles.css"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+      - "Playwright Today Workline smoke check"
+      - "Goal Maker checker"
+    stop_if:
+      - "Need any prohibited integration or automatic execution."
+      - "Need files outside allowed_files."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/backup.ts"
+        - "src/backup.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 35 tests passed. RED first covered missing Packet History helpers and backup validation."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+        - cmd: "Playwright Packet History smoke check"
+          status: pass
+          summary: "Packet History section rendered; six rapid saves capped at five entries; clear returned to empty state. Clean rerun showed no React duplicate-key console errors."
+      summary: "Added a bounded Packet History surface under Latest Useful Packet. The user can manually save the current packet, copy prior packets, see fresh/stale badges, clear the history, and retain it through localStorage plus JSON backup/restore. Packet history entries are capped at five and receive unique IDs even on rapid saves."
+
+  - id: T053
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether bounded Packet History satisfies the local-first v0.1 scope."
+    inputs:
+      - "T052 receipt"
+      - "Verification outputs"
+    constraints:
+      - "Do not implement."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+    receipt:
+      result: done
+      decision: "T052 is complete. It preserves local-only/copy-only behavior, adds bounded history without new dependencies or integrations, and passed tests, build, and browser smoke verification."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T054
+
+  - id: T054
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Scout the next small reuse improvement after bounded Packet History, likely a tiny Memory Vault reuse index or packet-to-context action."
+    inputs:
+      - "T052 receipt"
+      - "T053 audit"
+      - "Current Memory Vault / Latest Useful Packet / Focus Mode surfaces"
+    constraints:
+      - "Read-only until the next implementation request."
+      - "Keep v0.1 local-first, copy-only, and small."
+    expected_output:
+      - "Recommended next Worker task"
+      - "Risk"
+      - "Verification strategy"
+    receipt:
+      result: done
+      summary: "The highest-leverage next reuse slice is to make saved packets reusable both in Memory Vault export and back into 文脈パック."
+      evidence:
+        - "T052 added bounded project packetHistory and Latest Useful Packet cards."
+        - "buildMemoryVaultMarkdownExport already has a Reuse Index section but no saved-packet index."
+        - "applyTraceToContextPack already established the non-duplicating context reflection pattern."
+      recommended_next_worker: T056
+      risk: "Packet reuse can duplicate stale context or make Memory Vault noisy; keep it manual, bounded, stale-aware, and deduplicated by packet id."
+      verification_strategy: "TDD for reuse index and packet-to-context helper, npm test, npm run build, and browser smoke for save -> reflect -> Memory Vault index."
+
+  - id: T055
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Decide whether Memory Vault reuse index plus packet-to-context reflection is safe for v0.1."
+    inputs:
+      - "T054 receipt"
+      - "Current local-first constraints"
+    constraints:
+      - "Do not implement."
+      - "Reject if this adds external integration, automatic execution, sync, or direct filesystem writes."
+    expected_output:
+      - "approved | rejected"
+      - "bounded Worker scope"
+    receipt:
+      result: done
+      decision: approved
+      bounded_worker_scope: "Add deterministic prompt-builder helpers for Memory Vault packet reuse index and packet-to-context reflection; wire existing Packet History cards to a manual reflect button; include saved packets in Memory Vault markdown export."
+      next_allowed_task: T060
+
+  - id: T056
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Implement Memory Vault reuse index and a manual saved-packet-to-context-pack reflection action."
+    inputs:
+      - "T054 Scout receipt"
+      - "T055 Judge approval"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep local-only and copy-only."
+      - "No external API calls, model calls, shell execution, auth, sync, direct filesystem access, or Codex App Server integration."
+      - "No broad UI refactor or dependency additions."
+    allowed_files:
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+      - "src/promptBuilders.test.ts"
+      - "src/styles.css"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+      - "Playwright Today Workline smoke check"
+      - "Goal Maker checker"
+    stop_if:
+      - "Need any prohibited integration or automatic execution."
+      - "Need files outside allowed_files."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 38 tests passed. RED first failed on missing buildMemoryVaultReuseIndex/applyPacketToContextPack and missing Memory Vault packet index."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+        - cmd: "Playwright Memory reuse smoke check"
+          status: pass
+          summary: "Saved one packet, reflected it into 文脈パック as REUSE_PACKET with ID/NEXT, and verified Memory Vault textarea includes Reuse Packet Index with fresh state and next text."
+      summary: "Added buildMemoryVaultReuseIndex and applyPacketToContextPack. Memory Vault export now includes a saved-packet reuse index from bounded Packet History. Packet History cards now include a manual 文脈へ反映 action that appends a REUSE_PACKET block and deduplicates by packet id."
+
+  - id: T057
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T056 satisfies Memory Vault reuse and packet-to-context reflection without crossing v0.1 boundaries."
+    inputs:
+      - "T056 receipt"
+      - "Verification outputs"
+    constraints:
+      - "Do not implement."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+    receipt:
+      result: done
+      decision: "T056 is complete. It is manual, localStorage-backed, deterministic, and copy/export-only; no model calls, integrations, sync, or filesystem writes were added."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T058
+
+  - id: T058
+    type: scout
+    assignee: Scout
+    status: done
+    reasoning_hint: default
+    objective: "Scout the next small improvement after packet reuse, likely stale packet cleanup nudges or a tiny daily workline summary."
+    inputs:
+      - "T056 receipt"
+      - "T057 audit"
+      - "Current Packet History / Memory Vault / Focus Mode surfaces"
+    constraints:
+      - "Read-only until the next implementation request."
+      - "Keep v0.1 local-first, copy-only, and small."
+    expected_output:
+      - "Recommended next Worker task"
+      - "Risk"
+      - "Verification strategy"
+    receipt:
+      result: done
+      summary: "Today Workline Summary is the best next slice because it compresses current task, reflected packets, TRACE, GOLDEN, and NEXT without adding cleanup automation."
+      evidence:
+        - "T056 added packet reflection into 文脈パック as REUSE_PACKET blocks."
+        - "Latest Useful Packet and Memory Vault already expose reusable work memory, but there is no one-screen daily copy summary."
+        - "Focus Mode already names the active work flow, which can be included in the summary."
+      recommended_next_worker: T060
+      risk: "The summary could become too long or duplicate Memory Vault; keep it compact, manual, and focused on today."
+      verification_strategy: "TDD for summary builder, npm test, npm run build, browser smoke for visible summary, NEXT, reflected packet, stale warning, and copy status."
+
+  - id: T059
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Decide whether Today Workline Summary is safe and bounded for v0.1."
+    inputs:
+      - "T058 receipt"
+      - "Owner CREOLE request for Today Workline Summary"
+    constraints:
+      - "Do not implement."
+      - "Reject if this adds automatic cleanup, external sync, vector search, background automation, or new dependencies."
+    expected_output:
+      - "approved | rejected"
+      - "bounded Worker scope"
+    receipt:
+      result: done
+      decision: approved
+      bounded_worker_scope: "Add deterministic buildTodayWorklineSummary, a compact UI panel, and a copy button. Include focus flow, latest useful packet, reflected packet ids/summaries, stale warnings, TRACE, GOLDEN, and NEXT."
+      next_allowed_task: T060
+
+  - id: T060
+    type: worker
+    assignee: Worker
+    status: done
+    reasoning_hint: default
+    objective: "Implement Today Workline Summary as a compact copy-only daily summary."
+    inputs:
+      - "T058 Scout receipt"
+      - "T059 Judge approval"
+      - "Owner CREOLE request"
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+    constraints:
+      - "Keep local-first and copy-only."
+      - "No automatic cleanup, external sync, vector search, background automation, new dependencies, model calls, shell execution, auth, or broad UI refactor."
+    allowed_files:
+      - "src/App.tsx"
+      - "src/promptBuilders.ts"
+      - "src/promptBuilders.test.ts"
+      - "src/styles.css"
+      - "docs/goals/madowaku-codex-cockpit-v0-1/state.yaml"
+    verify:
+      - "npm test"
+      - "npm run build"
+      - "Playwright Today Workline smoke check"
+      - "Goal Maker checker"
+    stop_if:
+      - "Need prohibited automation, sync, dependency, or integration."
+      - "Need files outside allowed_files."
+    receipt:
+      result: done
+      changed_files:
+        - "src/App.tsx"
+        - "src/promptBuilders.ts"
+        - "src/promptBuilders.test.ts"
+        - "src/styles.css"
+      commands:
+        - cmd: "npm test"
+          status: pass
+          summary: "Vitest: 2 files passed, 39 tests passed. RED first failed on missing buildTodayWorklineSummary."
+        - cmd: "npm run build"
+          status: pass
+          summary: "tsc and vite build completed successfully."
+        - cmd: "Playwright Today Workline smoke check"
+          status: pass
+          summary: "Seeded reflected fresh and stale packets; summary appeared, included task and NEXT, included reflected packet ids, showed stale warning, and copy status changed to Today Workline Summary copied."
+      summary: "Added buildTodayWorklineSummary and a Today Workline Summary panel. The summary includes project, task, status, active Focus Mode flow, latest useful packet summary, reflected REUSE_PACKET ids/summaries, stale warnings, TRACE, GOLDEN, and NEXT. It is manual and copy-only."
+
+  - id: T061
+    type: judge
+    assignee: Judge
+    status: done
+    reasoning_hint: default
+    objective: "Audit whether T060 satisfies Today Workline Summary without crossing v0.1 boundaries."
+    inputs:
+      - "T060 receipt"
+      - "Verification outputs"
+    constraints:
+      - "Do not implement."
+    expected_output:
+      - "complete | not_complete"
+      - "missing evidence"
+      - "scope violations"
+    receipt:
+      result: done
+      decision: "T060 is complete. It adds a deterministic copy-only summary, preserves manual packet reuse, and passed tests, build, and browser smoke verification."
+      missing_evidence: []
+      scope_violations: []
+      next_allowed_task: T062
+
+  - id: T062
+    type: scout
+    assignee: Scout
+    status: active
+    reasoning_hint: default
+    objective: "Scout stale packet cleanup prompts with explicit manual delete/archive only."
+    inputs:
+      - "T060 receipt"
+      - "T061 audit"
+      - "Owner NEXT: stale packet cleanup prompts"
+      - "Current Packet History and Today Workline Summary surfaces"
+    constraints:
+      - "Read-only until the next implementation request."
+      - "No automatic cleanup, deletion, archive, sync, or background automation."
+      - "Keep v0.1 local-first, copy-only, and small."
+    expected_output:
+      - "Recommended next Worker task"
+      - "Risk"
+      - "Verification strategy"
+    receipt: null
+checks:
+  dirty_fingerprint: unknown
+  last_verification:
+    result: pass
+    task: T060
+    commands:
+      - "npm test"
+      - "npm run build"
+      - "Goal Maker checker"
+      - "Playwright Today Workline smoke check"
+
+
+
+
+
