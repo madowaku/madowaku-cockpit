@@ -53,6 +53,8 @@ Safety boundaries:
 - Output is bounded so ChatGPT receives reviewable excerpts instead of unbounded dumps.
 - Suspicious secret-looking content snippets are redacted from readable files, search previews, and context packs.
 
+GitHub guardrail: CI runs `npm ci`, `npm test`, `npm run build`, and `npm run mcp:smoke` on `main` and pull requests. The test suite includes a fixed tool-name regression so write, shell, auth, or mutation tools cannot be added quietly.
+
 ### Capability Boundary
 
 Allowed tools:

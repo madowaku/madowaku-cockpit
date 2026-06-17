@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added GitHub Actions CI for the read-only MCP bridge baseline.
+- Documented the CI guardrail that keeps write, shell, auth, and mutation tools out of scope.
+
 ## v1.0.0 - Read-Only MCP Bridge Baseline
 
 - Froze the bridge as a stable read-only ChatGPT-to-Codex handoff port.
