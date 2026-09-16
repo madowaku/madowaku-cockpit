@@ -1,0 +1,4 @@
+interface:
+  display_name: "Motion Librarian"
+  short_description: "Reuse-first UI motion and animation integration"
+  default_prompt: "Use $motion-librarian to inspect the existing motion language, reuse established animation patterns and runtimes, avoid unnecessary dependencies, preserve reduced-motion behavior, and verify real interaction states."
