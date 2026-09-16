@@ -1,0 +1,4 @@
+interface:
+  display_name: "Component Librarian"
+  short_description: "Reuse-first UI component selection and composition"
+  default_prompt: "Use $component-librarian to inspect the existing component system, reuse or compose established primitives before creating new ones, preserve semantics and accessibility, and verify important interaction states."
