@@ -1,0 +1,4 @@
+interface:
+  display_name: "Icon Librarian"
+  short_description: "Reuse-first UI icon selection and integration"
+  default_prompt: "Use $icon-librarian to select and integrate UI icons by preserving the project's existing icon language, searching established libraries before drawing custom SVGs, and verifying accessibility and visual consistency."
