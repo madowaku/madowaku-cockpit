@@ -10,8 +10,42 @@ Detailed review-first workflow docs: [docs/mcp-workflow.md](docs/mcp-workflow.md
 Security baseline docs: [docs/mcp-security.md](docs/mcp-security.md).
 v1.0 baseline: [docs/mcp-v1-baseline.md](docs/mcp-v1-baseline.md).
 Icon source policy: [ICON_SOURCES.md](ICON_SOURCES.md).
-Icon selection agent rule: [docs/icon-librarian.md](docs/icon-librarian.md).
+Legacy icon selection rule: [docs/icon-librarian.md](docs/icon-librarian.md).
+Reusable Codex skill: [skills/icon-librarian/SKILL.md](skills/icon-librarian/SKILL.md).
 Change history: [CHANGELOG.md](CHANGELOG.md).
+
+## Reusable Codex Skill: icon-librarian
+
+`skills/icon-librarian/` is a self-contained Codex Skill for reuse-first UI icon selection, integration, accessibility, motion gating, dependency discipline, and rendered-context review.
+
+Structure:
+
+```text
+skills/icon-librarian/
+  SKILL.md
+  agents/
+    openai.yaml
+  references/
+    source-catalog.md
+    review-checklist.md
+```
+
+The skill is intentionally portable. Copy the whole `skills/icon-librarian` directory into the Codex skills location used by your environment rather than copying only `SKILL.md`, because the skill reads its reference files on demand.
+
+Example invocation:
+
+```text
+Use $icon-librarian to replace the toolbar icons while preserving the existing design language, avoiding unnecessary dependencies, and checking icon-only controls for accessible names.
+```
+
+Core behavior:
+
+1. inspect the project's current icon language;
+2. reuse local assets and installed families first;
+3. fall back through established libraries only when needed;
+4. gate animation, new dependencies, and custom SVGs;
+5. normalize optical weight, sizing, states, and accessibility;
+6. verify the icon in rendered context before claiming visual consistency.
 
 Status:
 
