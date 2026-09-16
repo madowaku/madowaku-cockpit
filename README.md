@@ -9,6 +9,8 @@ This repo includes a minimal read-only MCP-style stdio bridge for letting ChatGP
 Detailed review-first workflow docs: [docs/mcp-workflow.md](docs/mcp-workflow.md).
 Security baseline docs: [docs/mcp-security.md](docs/mcp-security.md).
 v1.0 baseline: [docs/mcp-v1-baseline.md](docs/mcp-v1-baseline.md).
+Icon source policy: [ICON_SOURCES.md](ICON_SOURCES.md).
+Icon selection agent rule: [docs/icon-librarian.md](docs/icon-librarian.md).
 Change history: [CHANGELOG.md](CHANGELOG.md).
 
 Status:
