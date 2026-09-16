@@ -11,41 +11,32 @@ Security baseline docs: [docs/mcp-security.md](docs/mcp-security.md).
 v1.0 baseline: [docs/mcp-v1-baseline.md](docs/mcp-v1-baseline.md).
 Icon source policy: [ICON_SOURCES.md](ICON_SOURCES.md).
 Legacy icon selection rule: [docs/icon-librarian.md](docs/icon-librarian.md).
-Reusable Codex skill: [skills/icon-librarian/SKILL.md](skills/icon-librarian/SKILL.md).
+Reusable UI Librarian skill catalog: [skills/README.md](skills/README.md).
 Change history: [CHANGELOG.md](CHANGELOG.md).
 
-## Reusable Codex Skill: icon-librarian
+## Reusable Codex Skill Family: UI Librarians
 
-`skills/icon-librarian/` is a self-contained Codex Skill for reuse-first UI icon selection, integration, accessibility, motion gating, dependency discipline, and rendered-context review.
-
-Structure:
+`skills/` contains a reuse-first UI skill family. The parent `$ui-librarian` inspects the local design system and routes only the required domains to specialist skills.
 
 ```text
-skills/icon-librarian/
-  SKILL.md
-  agents/
-    openai.yaml
-  references/
-    source-catalog.md
-    review-checklist.md
+$ui-librarian
+  ├─ $icon-librarian
+  ├─ $font-librarian
+  ├─ $component-librarian
+  └─ $motion-librarian
 ```
 
-The skill is intentionally portable. Copy the whole `skills/icon-librarian` directory into the Codex skills location used by your environment rather than copying only `SKILL.md`, because the skill reads its reference files on demand.
+Use `$ui-librarian` for cross-domain screens, flows, or design-system work. Use a specialist directly when the task is clearly limited to one domain. The family shares one operating principle: inspect and curate before inventing.
+
+Each skill is kept portable under `skills/<name>/` with its own `SKILL.md`, `agents/openai.yaml`, and optional references. Copy the complete skill directory into the Codex skills location used by your environment so any on-demand references remain available.
 
 Example invocation:
 
 ```text
-Use $icon-librarian to replace the toolbar icons while preserving the existing design language, avoiding unnecessary dependencies, and checking icon-only controls for accessible names.
+Use $ui-librarian to implement this settings panel without introducing redundant UI dependencies. Route icon, component, typography, and motion decisions to the relevant specialist skills and preserve the existing design language.
 ```
 
-Core behavior:
-
-1. inspect the project's current icon language;
-2. reuse local assets and installed families first;
-3. fall back through established libraries only when needed;
-4. gate animation, new dependencies, and custom SVGs;
-5. normalize optical weight, sizing, states, and accessibility;
-6. verify the icon in rendered context before claiming visual consistency.
+See [skills/README.md](skills/README.md) for routing rules, specialist responsibilities, and direct invocation examples.
 
 Status:
 
