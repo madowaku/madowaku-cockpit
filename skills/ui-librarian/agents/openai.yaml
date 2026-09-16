@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Librarian"
+  short_description: "Route UI work through reuse-first specialist skills"
+  default_prompt: "Use $ui-librarian to inspect the existing UI system, route each asset decision to the narrowest relevant librarian, avoid unnecessary dependencies or bespoke assets, and verify the integrated result in context."
