@@ -1,0 +1,4 @@
+interface:
+  display_name: "Font Librarian"
+  short_description: "Reuse-first font and typography integration"
+  default_prompt: "Use $font-librarian to inspect the existing type system, reuse current font assets and tokens where possible, avoid unnecessary font dependencies, and verify legibility and loading behavior in context."
