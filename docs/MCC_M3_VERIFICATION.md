@@ -1,5 +1,7 @@
 # M3.0 verification — 2026-10-22
 
+Historical baseline: the audit and browser-import limitations below describe M3.0. See [M3.0.1 security and acceptance gate](MCC_M3_0_1_SECURITY_GATE.md) for the dependency fixes, zero-finding re-audit and completed agent-driven JSON import check. Human acceptance remains unperformed.
+
 Base: MCC main `a42994ef89f0b8030ac40a28ed4c0699cfb7e2de`.
 Environment: Windows / Node v24.14.0. Isolated checkout; original MSO branch and untracked package-lock preserved.
 

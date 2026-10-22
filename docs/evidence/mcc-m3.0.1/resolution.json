@@ -1,0 +1,51 @@
+{
+  "observedAt": "2026-10-22T14:23:14.814Z",
+  "node": "v24.14.0",
+  "lockSha256": "8dbf611fd4bee658630e1a08748938dce0838af80f75a11d48b3b97820de13dd",
+  "packages": [
+    {
+      "name": "@babel/core",
+      "after": "7.29.7"
+    },
+    {
+      "name": "@vitest/mocker",
+      "after": "4.1.12"
+    },
+    {
+      "name": "baseline-browser-mapping",
+      "after": "2.11.30"
+    },
+    {
+      "name": "browserslist",
+      "after": "4.29.4"
+    },
+    {
+      "name": "esbuild",
+      "after": "0.28.2"
+    },
+    {
+      "name": "nanoid",
+      "after": "3.3.20"
+    },
+    {
+      "name": "postcss",
+      "after": "8.5.31"
+    },
+    {
+      "name": "source-map-js",
+      "after": "1.2.2"
+    },
+    {
+      "name": "tinypool",
+      "after": "removed"
+    },
+    {
+      "name": "vite",
+      "after": "7.3.7"
+    },
+    {
+      "name": "vitest",
+      "after": "4.1.12"
+    }
+  ]
+}
