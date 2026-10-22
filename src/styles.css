@@ -6,6 +6,17 @@
   text-rendering: optimizeLegibility;
 }
 
+.first-run { padding: 24px; background: #fffaf0; border: 2px solid #39695d; border-radius: 12px; min-width: 0; }
+.first-run label { display: grid; gap: 8px; margin-bottom: 12px; }
+.first-run input, .first-run select { width: 100%; min-width: 0; padding: 10px; }
+.first-run pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: #eee8da; }
+.first-run-options { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.first-run button { padding: 12px; border: 1px solid #39695d; border-radius: 6px; background: #fffaf0; color: #22332e; }
+.first-run button[aria-pressed="true"] { background: #22332e; color: #fffaf0; }
+.first-run details { padding: 12px 0; border-block: 1px solid #c1b7a2; }
+.first-run summary { cursor: pointer; }
+.first-run article { margin-top: 20px; }
+
 * {
   box-sizing: border-box;
 }

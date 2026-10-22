@@ -2,6 +2,15 @@
 
 Local-first cockpit for copy-only AI handoffs, review notes, and AI Creole packets.
 
+## First Run — 目的からはじめる
+
+`npm ci` → `npm run dev -- --host 127.0.0.1` で表示されたURLを開き、「今日は何をしたいですか？」に入力してください。
+システム診断、候補の案内、既存CLIの起動手順と結果に応じた次の操作を確認できます。
+無料・ローカルの案内で、コマンドの実行は手動です。
+[MCC-M3.0 起動ガイド・既存資産調査・実装境界](docs/MCC_M3_FIRST_RUN.md)。
+
+[M3.0.1 セキュリティ検証](docs/MCC_M3_0_1_SECURITY_GATE.md) / [人間向け5分の操作確認（未実施）](docs/MCC_M3_0_1_HUMAN_ACCEPTANCE.md)。Node 22.12以上または24を使用してください。
+
 ## Read-Only MCP Local Bridge
 
 This repo includes a minimal read-only MCP-style stdio bridge for letting ChatGPT inspect local context without granting shell or write access.

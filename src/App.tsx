@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBackupText, restoreBackupText } from './backup';
+import { FirstRun } from './FirstRunPanel';
 import {
   buildGoalMakerPrompt,
   buildPlanPrompt,
@@ -332,6 +333,7 @@ export default function App() {
           <div className="saved-pill">Saved locally</div>
         </header>
 
+        <FirstRun />
         <section className="goal-band">
           <label className="project-notes">
             <span>Project Notes</span>
