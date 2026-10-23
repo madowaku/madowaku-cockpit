@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "setup": "node scripts/setup.mjs",
-    "test:unit": "node --test tests/*.test.mjs",
+    "test:unit": "node --test tests/contracts.check.mjs",
     "test:browser": "playwright test",
     "gate": "node scripts/gate.mjs",
     "compare": "node scripts/compare.mjs"

@@ -7,7 +7,7 @@ if (!/^(baseline|codex|claude)$/.test(variant)) {
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: '**/*.spec.mjs',
+  testMatch: '**/*.e2e.mjs',
   timeout: 30_000,
   retries: 0,
   workers: 1,
