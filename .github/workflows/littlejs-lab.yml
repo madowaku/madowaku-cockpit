@@ -1,0 +1,67 @@
+name: LittleJS Rapid Game Lab
+
+on:
+  pull_request:
+    paths:
+      - 'experiments/littlejs-lab/**'
+      - '.github/workflows/littlejs-lab.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'experiments/littlejs-lab/**'
+      - '.github/workflows/littlejs-lab.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    name: LittleJS Playwright canary (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: experiments/littlejs-lab
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install isolated Playwright dependency
+        run: npm install --no-package-lock --ignore-scripts --no-audit --no-fund
+
+      - name: Fetch and verify pinned LittleJS-AI assets
+        run: npm run setup
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      - name: Node contract tests
+        run: npm run test:unit
+
+      - name: Browser playtest and visual evidence
+        run: npm run test:browser
+
+      - name: Evidence quality gate
+        run: npm run gate
+
+      - name: Report model-comparison readiness (not a pass criterion)
+        run: npm run compare
+
+      - name: Upload evidence including failure traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: littlejs-lab-${{ matrix.os }}
+          path: |
+            experiments/littlejs-lab/evidence
+            experiments/littlejs-lab/test-results
+            experiments/littlejs-lab/comparison
+          if-no-files-found: warn

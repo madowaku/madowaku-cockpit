@@ -1,0 +1,11 @@
+{
+  "agent": "codex",
+  "model": "REPLACE_WITH_REAL_MODEL_ID",
+  "prompt_sha256": "REPLACE_WITH_SHA256_OF_benchmark/prompt.md",
+  "engine_revision": "5b712052848b58e4fce127cec2531c024cb3d9b5",
+  "duration_seconds": null,
+  "input_tokens": null,
+  "output_tokens": null,
+  "cost_usd": null,
+  "human_playability_score": null
+}
