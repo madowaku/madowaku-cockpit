@@ -1,0 +1,16 @@
+{
+  "name": "mgsf-m1-3-littlejs-rapid-game-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "test:unit": "node --test tests/*.test.mjs",
+    "test:browser": "playwright test",
+    "gate": "node scripts/gate.mjs",
+    "compare": "node scripts/compare.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
