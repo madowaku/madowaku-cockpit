@@ -131,7 +131,7 @@ export function filterAssets(
 
 /** Copy-only prompt for AI/Codex research; never pretends to have searched a provider. */
 export function createAssetResearchPrompt(query: string, kind: AssetKind | 'all', readyOnly: boolean): string {
-  const request = query.replace(/[\\r\\n]+/g, ' ').trim().slice(0, 160) || '用途に合うゲーム素材を探す';
+  const request = query.replace(/[\r\n]+/g, ' ').trim().slice(0, 160) || '用途に合うゲーム素材を探す';
   const target = kind === 'all' ? '指定なし' : KIND_LABELS[kind];
   const urls = ASSET_SOURCES.map((source) => '- ' + source.name + ': ' + source.url);
   return [
@@ -156,7 +156,7 @@ export function createAssetResearchPrompt(query: string, kind: AssetKind | 'all'
     'OUTPUT: 推奨トップ3、比較表、採用リスク、Godot導入の手順と手動品質ゲート。',
     'NO: 無断ダウンロード、著作権の断定、自動インストール、存在しない素材やURLの捏造。',
     ''
-  ].join('\\n');
+  ].join('\n');
 }
 
 export function createGodotHandoff(items: readonly AssetEntry[]): string {
