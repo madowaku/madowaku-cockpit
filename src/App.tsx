@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBackupText, restoreBackupText } from './backup';
+import AssetStudio from './AssetStudio';
 import {
   buildGoalMakerPrompt,
   buildPlanPrompt,
@@ -98,6 +99,7 @@ function loadProjects() {
 
 export default function App() {
   const [projects, setProjects] = useState<CockpitProject[]>(loadProjects);
+  const [assetStudioOpen, setAssetStudioOpen] = useState(false);
   const [activeProjectId, setActiveProjectId] = useState(projects[0]?.id ?? starterProjects[0].id);
   const [copied, setCopied] = useState<string | null>(null);
   const [backupStatus, setBackupStatus] = useState('手動バックアップでlocalStorageを守れます。');
@@ -283,6 +285,8 @@ export default function App() {
     }
   }
 
+  if (assetStudioOpen) return <AssetStudio onBack={() => setAssetStudioOpen(false)} />;
+
   return (
     <main className="cockpit-shell">
       <aside className="project-rail" aria-label="Projects">
@@ -305,6 +309,11 @@ export default function App() {
             </button>
           ))}
         </div>
+
+        <button className="add-project asset-studio-launch" type="button" onClick={() => setAssetStudioOpen(true)}>
+          ✳ Asset Studio
+          <small>素材を探す・権利を確認・Godotへ引き継ぐ</small>
+        </button>
 
         <button className="add-project" onClick={addProject} type="button">
           + Project
