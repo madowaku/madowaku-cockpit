@@ -4,6 +4,7 @@ import {
   CURATED_ASSETS,
   KIND_LABELS,
   createGodotHandoff,
+  createAssetResearchPrompt,
   filterAssets,
   licenseVerdict,
   type AssetKind
@@ -68,6 +69,15 @@ export default function AssetStudio({ onBack }: Props) {
       setFeedback('Godot導入メモをコピーしました。');
     } catch {
       setFeedback('クリップボードが使えません。Markdownを書き出してください。');
+    }
+  }
+
+  async function copyResearchPrompt() {
+    try {
+      await navigator.clipboard.writeText(createAssetResearchPrompt(query, kind, readyOnly));
+      setFeedback('8サイト向けのAI調査指示をコピーしました。CodexやClaude Codeに貼り付けて使えます。');
+    } catch {
+      setFeedback('コピーできませんでした。ブラウザのクリップボード権限を確認してください。');
     }
   }
 
@@ -156,6 +166,13 @@ export default function AssetStudio({ onBack }: Props) {
               </button>
             ))}
             <span className="asset-filter-hint">サンプル画像ではなく装飾イラストを表示しています</span>
+          </div>
+
+          <div className="asset-research-guide">
+            <div><span>BEYOND THE CATALOG</span><strong>ここにない素材も、AIと探せる。</strong>
+              <p>検索条件をもとに、8サイトの調査・ライセンス確認・Godot互換性評価を指示するプロンプトを作ります。実際の検索はCodexやClaude Codeに渡して実行します。</p>
+            </div>
+            <button type="button" onClick={() => void copyResearchPrompt()}>AI調査指示をコピー <span aria-hidden="true">↗</span></button>
           </div>
 
           <div className="asset-main-grid">
