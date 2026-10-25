@@ -13,6 +13,8 @@ export type AssetEntry = {
   evidenceUrl: string;
   rights: RightsStatus;
   license: string;
+  author?: string;
+  creditText?: string;
   godotHint: string;
   symbol: string;
   tone: string;
@@ -40,7 +42,7 @@ export const ASSET_SOURCES: readonly AssetSource[] = [
   { id: 'godot', name: 'Godot Asset Store', domain: 'store.godotengine.org', url: 'https://store.godotengine.org/', specialty: 'Godot / Add-ons', licenseNote: '新Asset Storeを優先。旧Asset Libraryは非推奨。各アドオンの利用条件は個別確認。', status: 'item-review', symbol: '⬡' }
 ];
 
-/** Hand-picked real pack pages, not live search results or locally hosted asset files. */
+/** Hand-picked real asset pages, not live search results or locally hosted asset files. */
 export const CURATED_ASSETS: readonly AssetEntry[] = [
   {
     id: 'kenney-pixel-ui', title: 'Pixel UI Pack', source: 'Kenney', kind: 'ui', style: 'Pixel art',
@@ -90,6 +92,26 @@ export const CURATED_ASSETS: readonly AssetEntry[] = [
     url: 'https://kenney.nl/assets/mini-characters', evidenceUrl: 'https://kenney.nl/assets/mini-characters',
     rights: 'verified-cc0', license: 'CC0', godotHint: 'Godot側のアニメーション・リグ・スケルトン互換性を取り込み後に確認。',
     symbol: '♟', tone: 'lavender'
+  },
+  {
+    id: 'game-icons-crossed-swords', title: 'Crossed swords', source: 'Game-icons.net', kind: 'icons', style: 'Fantasy',
+    tags: ['RPG', 'swords', 'battle', 'skill', 'combat', 'icons'], description: 'Lorc制作の交差した剣のアイコン。RPGの戦闘UIやスキルに。',
+    url: 'https://game-icons.net/1x1/lorc/crossed-swords.html',
+    evidenceUrl: 'https://game-icons.net/1x1/lorc/crossed-swords.html',
+    rights: 'attribution-required', license: 'CC BY 3.0', author: 'Lorc',
+    creditText: 'Crossed swords icon by Lorc, via game-icons.net, licensed under CC BY 3.0. https://game-icons.net/1x1/lorc/crossed-swords.html',
+    godotHint: '原本のSVG/PNGを取得しres://assets/icons/へ。必要なクレジットをゲーム内のCredits画面に追加。',
+    symbol: '⚔', tone: 'amber'
+  },
+  {
+    id: 'game-icons-two-handed-sword', title: 'Two handed sword', source: 'Game-icons.net', kind: 'icons', style: 'Fantasy',
+    tags: ['RPG', 'sword', 'weapons', 'equipment', 'icons'], description: 'Delapouite制作の両手剣アイコン。武器選択画面などの候補。',
+    url: 'https://game-icons.net/1x1/delapouite/two-handed-sword.html',
+    evidenceUrl: 'https://game-icons.net/1x1/delapouite/two-handed-sword.html',
+    rights: 'attribution-required', license: 'CC BY 3.0', author: 'Delapouite',
+    creditText: 'Two handed sword icon by Delapouite, via game-icons.net, licensed under CC BY 3.0. https://game-icons.net/1x1/delapouite/two-handed-sword.html',
+    godotHint: '原本のSVG/PNGを取得しres://assets/icons/へ。必要なクレジットをゲーム内のCredits画面に追加。',
+    symbol: '†', tone: 'violet'
   },
   {
     id: 'kenney-development-essentials', title: 'Development Essentials', source: 'Kenney', kind: '2d', style: 'Prototype',
@@ -175,6 +197,8 @@ export function createGodotHandoff(items: readonly AssetEntry[]): string {
       '- 出典: ' + asset.source,
       '- 素材ページ: ' + asset.url,
       '- ライセンス表記: ' + asset.license,
+      '- 作者: ' + (asset.author || '素材ページで最終確認'),
+      '- 必要クレジット: ' + (asset.creditText || '不要（ただし任意の出典表記は推奨）'),
       '- 権利判定: ' + decision.label,
       '- 根拠URL: ' + asset.evidenceUrl,
       '- Godot導入メモ: ' + asset.godotHint,
