@@ -18,6 +18,8 @@ export type AssetEntry = {
   godotHint: string;
   symbol: string;
   tone: string;
+  /** Verified static image of the actual asset, not a generated depiction. */
+  previewUrl?: string;
 };
 
 export type AssetSource = {
@@ -101,7 +103,7 @@ export const CURATED_ASSETS: readonly AssetEntry[] = [
     rights: 'attribution-required', license: 'CC BY 3.0', author: 'Lorc',
     creditText: 'Crossed swords icon by Lorc, via game-icons.net, licensed under CC BY 3.0. https://game-icons.net/1x1/lorc/crossed-swords.html',
     godotHint: '原本のSVG/PNGを取得しres://assets/icons/へ。必要なクレジットをゲーム内のCredits画面に追加。',
-    symbol: '⚔', tone: 'amber'
+    symbol: '⚔', tone: 'amber', previewUrl: 'https://game-icons.net/icons/ffffff/000000/1x1/lorc/crossed-swords.svg'
   },
   {
     id: 'game-icons-two-handed-sword', title: 'Two handed sword', source: 'Game-icons.net', kind: 'icons', style: 'Fantasy',
@@ -111,7 +113,7 @@ export const CURATED_ASSETS: readonly AssetEntry[] = [
     rights: 'attribution-required', license: 'CC BY 3.0', author: 'Delapouite',
     creditText: 'Two handed sword icon by Delapouite, via game-icons.net, licensed under CC BY 3.0. https://game-icons.net/1x1/delapouite/two-handed-sword.html',
     godotHint: '原本のSVG/PNGを取得しres://assets/icons/へ。必要なクレジットをゲーム内のCredits画面に追加。',
-    symbol: '†', tone: 'violet'
+    symbol: '†', tone: 'violet', previewUrl: 'https://game-icons.net/icons/ffffff/000000/1x1/delapouite/two-handed-sword.svg'
   },
   {
     id: 'kenney-development-essentials', title: 'Development Essentials', source: 'Kenney', kind: '2d', style: 'Prototype',
@@ -208,4 +210,22 @@ export function createGodotHandoff(items: readonly AssetEntry[]): string {
   }
   lines.push('## Quality Gate', '- [ ] 商用利用条件と再配布条件を素材ごとに確認', '- [ ] 必要なクレジットを収集', '- [ ] 画風・解像度・音量・互換性を確認', '- [ ] 原本URLと確認日を記録', '');
   return lines.join('\n');
+}
+
+/** Advisory, explainable visual-style matching. This is deterministic curation, NOT MAF model inference. */
+export type StyleIntent = 'pixel' | 'fantasy' | 'lowpoly' | 'prototype';
+export const STYLE_INTENTS: Record<StyleIntent, { label: string; tags: readonly string[]; hint: string }> = {
+  pixel: { label: 'ピクセルRPG', tags: ['pixel', 'retro', 'rpg', 'ui', '2d'], hint: '色数・ピクセル比率とUIの線幅を比較' },
+  fantasy: { label: 'ファンタジー', tags: ['fantasy', 'rpg', 'adventure', 'sword', 'combat'], hint: '装飾密度とスキルアイコンの輪郭を比較' },
+  lowpoly: { label: 'ローポリ3D', tags: ['low-poly', '3d', 'characters', 'race', 'mini'], hint: '頂点密度、シルエット、質感を比較' },
+  prototype: { label: '高速プロトタイプ', tags: ['prototype', 'development', 'ui', 'platformer', '3d'], hint: '制作速度と差し替えやすさを優先' }
+};
+
+export function assessStyleMatch(asset: AssetEntry, intent: StyleIntent) {
+  const rule = STYLE_INTENTS[intent];
+  const tags = [asset.style, asset.kind, ...asset.tags].map((s) => s.normalize('NFKC').toLowerCase());
+  const matched = rule.tags.filter((tag) => tags.some((field) => field === tag || field.includes(tag))).slice(0, 4);
+  // Fixed transparent rubric; no fabricated confidence percentages.
+  const level: 'strong' | 'possible' | 'low' = matched.length >= 2 ? 'strong' : matched.length === 1 ? 'possible' : 'low';
+  return { level, label: level === 'strong' ? '相性が良さそう' : level === 'possible' ? '比較候補' : '別の画風かも', evidence: matched, rationale: rule.hint };
 }
