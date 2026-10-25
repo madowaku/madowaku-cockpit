@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "bridge": "MCC-M3.1",
+  "upstream": {
+    "repository": "https://github.com/mattpocock/skills",
+    "license": "MIT",
+    "update_policy": "manual-reviewed",
+    "install_policy": "opt-in-only"
+  },
+  "modes": [
+    "discover",
+    "recommend",
+    "handoff"
+  ],
+  "default_mode": "discover",
+  "auto_install": false,
+  "auto_execute": false,
+  "skills": [
+    {
+      "id": "grill-with-docs",
+      "source": "skills/engineering/grill-with-docs/SKILL.md",
+      "use_when": "Unclear requirements or conflicting project terminology",
+      "route": "planning",
+      "priority": "trial",
+      "collision": "existing AI Creole handoff remains authoritative"
+    },
+    {
+      "id": "code-review",
+      "source": "skills/engineering/code-review/SKILL.md",
+      "use_when": "Review proposed code change separately from implementation",
+      "route": "review",
+      "priority": "trial",
+      "collision": "do not replace CI or mado-loop proof"
+    },
+    {
+      "id": "retro",
+      "source": "skills/engineering/retro/SKILL.md",
+      "use_when": "Reflect on completed work and generate improvement proposals",
+      "route": "retrospective",
+      "priority": "trial",
+      "collision": "never auto-modify runtime"
+    },
+    {
+      "id": "improve-codebase-architecture",
+      "source": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "use_when": "Survey maintainability and architectural hotspots",
+      "route": "architecture",
+      "priority": "trial",
+      "collision": "recommendations only"
+    },
+    {
+      "id": "to-spec",
+      "source": "skills/engineering/to-spec/SKILL.md",
+      "use_when": "Turn scoped idea into reviewable specification",
+      "route": "planning",
+      "priority": "later",
+      "collision": "preserve AI Creole contract"
+    },
+    {
+      "id": "to-tickets",
+      "source": "skills/engineering/to-tickets/SKILL.md",
+      "use_when": "Split approved specs into actionable tickets",
+      "route": "planning",
+      "priority": "later",
+      "collision": "no automatic external issue creation"
+    }
+  ],
+  "guardrails": {
+    "read_only_mcp": true,
+    "no_shell": true,
+    "no_secrets": true,
+    "no_background_sync": true,
+    "no_auto_update": true,
+    "requires_human_review": true,
+    "proof_authority": "mado-loop P0-P5",
+    "agent_invocation": "explicit only"
+  }
+}
