@@ -33,6 +33,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Verify Kenney original PNG blob hashes
+        run: node scripts/verify-kenney-blob-shas.mjs
+
       - name: Build
         run: npm run build
 
