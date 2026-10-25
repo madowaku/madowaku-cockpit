@@ -12,12 +12,10 @@ const waitJson = async (uri, ms = 16000) => {
   }
   throw new Error('CDP endpoint unavailable: ' + uri);
 };
-const page = await waitJson(url + '/json/new?' + encodeURIComponent(targetUrl)).catch(async () => {
-  // /json/new only accepts PUT on newer Chrome.
-  const res = await fetch(url + '/json/new?' + encodeURIComponent(targetUrl), { method: 'PUT' });
-  if (!res.ok) throw new Error('Cannot open CDP tab: ' + res.status);
-  return res.json();
-});
+await waitJson(url + '/json/version');
+const tabResponse = await fetch(url + '/json/new?' + encodeURIComponent(targetUrl), { method: 'PUT' });
+if (!tabResponse.ok) throw new Error('Cannot open CDP tab: ' + tabResponse.status);
+const page = await tabResponse.json();
 assert.ok(page.webSocketDebuggerUrl, 'Chrome tab is not debuggable');
 
 const socket = new WebSocket(page.webSocketDebuggerUrl);
