@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feat/mgsf-m1-5-asset-studio
   pull_request:
     branches:
       - main
