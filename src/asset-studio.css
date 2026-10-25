@@ -371,3 +371,21 @@
 @media (prefers-reduced-motion: reduce) {
   .asset-studio *, .asset-studio *::before, .asset-studio *::after { animation: none !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }
+
+/* M1.5.1: clearly distinguish source-hosted originals from decorative stand-ins. */
+.asset-real-preview { display: block; position: relative; z-index: 2; width: 112px; height: 112px; max-width: 65%; object-fit: contain; padding: 15px; background: #fffdf5; border-radius: 22px; box-shadow: 7px 7px 0 #17333922; }
+.asset-preview-provenance { position: absolute; z-index: 3; bottom: 11px; left: 12px; max-width: calc(100% - 25px); padding: 5px 7px; border-radius: 4px; background: #ffffffd9; color: #243c3a; font: 900 8px/1.4 "Segoe UI",sans-serif; letter-spacing: .065em; }
+.asset-style-compass { display: flex; gap: 22px; justify-content: space-between; align-items: center; padding: 21px 22px; margin-bottom: 16px; border: 1px solid #d8d2ed; border-radius: 12px; background: #f0ecfb; }
+.asset-style-head { max-width: 475px; }
+.asset-style-head > span { display: block; color: #7764a8; font: 900 10px/1.3 "Segoe UI",sans-serif; letter-spacing: .1em; }
+.asset-style-head strong { display: block; margin: 5px 0; font-size: 17px; color: #43345e; }
+.asset-style-head p { margin: 0; color: #716a7c; font-size: 11px; line-height: 1.6; }
+.asset-style-options { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.asset-style-options button { padding: 10px 12px; border: 1px solid #c5bddb; border-radius: 100px; background: #fff; color: #574a70; font-size: 11px !important; font-weight: 850; }
+.asset-style-options button.active { background: #574178; border-color: #574178; color: white; }
+.asset-style-options button:hover:not(.active) { background: #e3d7f7; }
+.asset-style-verdict { width: fit-content; max-width: 100%; margin-bottom: 9px; padding: 6px 8px; border-radius: 5px; color: #2b6b5a; background: #e6f5e9; font-size: 10px; font-weight: 850; overflow-wrap: anywhere; }
+.asset-style-verdict[data-level="possible"] { background: #fff2d8; color: #8b652f; }
+.asset-style-verdict[data-level="low"] { background: #f0f0ed; color: #6d7572; }
+@media (max-width: 1120px) { .asset-style-compass { flex-direction: column; align-items: stretch; } .asset-style-options { justify-content: flex-start; } }
+@media (max-width: 610px) { .asset-style-compass { padding: 15px; } .asset-style-options button { padding: 8px 9px; font-size: 10px !important; } .asset-real-preview { max-width: 90%; width: 82px; height: 82px; padding: 9px; } .asset-preview-provenance { font-size: 7px; } }
