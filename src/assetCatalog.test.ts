@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { KENNEY_PREVIEWS, kenneyPreviewCount, getPreviewGallery } from './kenneyPreviews';
 import { ASSET_SOURCES, CURATED_ASSETS, createGodotHandoff, createAssetResearchPrompt, filterAssets, licenseVerdict, assessStyleMatch, STYLE_INTENTS, type AssetEntry } from './assetCatalog';
 
 describe('MGSF Asset Studio catalog', () => {
@@ -32,9 +33,9 @@ describe('MGSF Asset Studio catalog', () => {
   it('filters by text and category without rewriting source data', () => {
     const originalCount = CURATED_ASSETS.length;
     expect(filterAssets(CURATED_ASSETS, ' RACING ', '3d').map((asset) => asset.id)).toEqual(['kenney-racing']);
-    expect(filterAssets(CURATED_ASSETS, '', 'ui').length).toBe(2);
+    expect(filterAssets(CURATED_ASSETS, '', 'ui').length).toBe(4);
     expect(filterAssets(CURATED_ASSETS, '', 'icons').length).toBe(3);
-    expect(filterAssets(CURATED_ASSETS, '', 'all', true).length).toBe(8);
+    expect(filterAssets(CURATED_ASSETS, '', 'all', true).length).toBe(10);
     expect(filterAssets(CURATED_ASSETS, 'unmatched', 'all')).toEqual([]);
     expect(CURATED_ASSETS).toHaveLength(originalCount);
   });
@@ -72,6 +73,24 @@ describe('MGSF Asset Studio catalog', () => {
       expect(item.previewUrl).toContain(item.url.split('/').pop()?.replace('.html', '.svg'));
     }
     expect(CURATED_ASSETS.filter((item) => item.source === 'Kenney').every((item) => !item.previewUrl)).toBe(true);
+  });
+
+  it('only attaches original Kenney sample PNGs to the matching packs, with verifiable Git SHAs', () => {
+    expect(kenneyPreviewCount).toBe(13);
+    expect(Object.keys(KENNEY_PREVIEWS)).toHaveLength(6);
+    for (const [id,gallery] of Object.entries(KENNEY_PREVIEWS)) {
+      const asset = CURATED_ASSETS.find(item => item.id === id);
+      expect(asset?.source).toBe('Kenney');
+      expect(asset?.license).toBe('CC0');
+      expect(gallery.collection.length).toBeGreaterThan(2);
+      for (const sample of gallery.samples) {
+        expect(sample.src).toMatch(/^\/asset-previews\/kenney\/[a-z0-9-]+\.png$/);
+        expect(sample.sourcePath).toMatch(/\.png$/);
+        expect(sample.blobSha).toMatch(/^[0-9a-f]{40}$/);
+      }
+    }
+    expect(getPreviewGallery('kenney-pixel-ui')).toBeUndefined();
+    expect(getPreviewGallery('game-icons-crossed-swords')).toBeUndefined();
   });
 
   it('explains MAF style ranking using tags, not fictitious AI confidence', () => {
