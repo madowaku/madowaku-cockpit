@@ -184,6 +184,7 @@
 .asset-card-body { display: grid; align-content: start; padding: 18px; }
 .asset-card-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; color: #7c8c89; font: 800 10px/1.5 "Segoe UI",sans-serif; letter-spacing: .04em; }
 .asset-license-mark { color: #307b62; }
+.asset-license-caution { color: #a26834; }
 .asset-studio .asset-card h3 { margin: 10px 0 8px; font-size: 20px; line-height: 1.25; letter-spacing: -.04em; overflow-wrap: anywhere; }
 .asset-card-body > p { min-height: 47px; margin: 0 0 12px; color: #647672; font-size: 12px; line-height: 1.7; }
 .asset-tags { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -209,6 +210,10 @@
 .asset-panel-asterisk { font-size: 22px; color: #639988; }
 .asset-inspector h3 { margin: 13px 0; font-size: 22px; line-height: 1.2; letter-spacing: -.04em; }
 .asset-verdict-ready { display: inline-flex; padding: 6px 9px; border-radius: 99px; background: #c7ebd8; color: #23664e; font-size: 11px; font-weight: 900; }
+.asset-verdict-caution { display: inline-flex; padding: 6px 9px; border-radius: 99px; background: #f9e8c0; color: #83511c; font-size: 11px; font-weight: 900; }
+.asset-credit-note { margin: -9px 0 21px; padding: 13px 12px; border-left: 3px solid #df9d4f; border-radius: 5px; background: #fff6e6; }
+.asset-credit-note strong { display: block; margin-bottom: 6px; color: #755125; font-size: 11px; }
+.asset-credit-note p { margin: 0; color: #634d31; font-size: 11px; line-height: 1.65; overflow-wrap: anywhere; }
 .asset-inspector-note { margin: 12px 0 16px; color: #456960; font-size: 12px; line-height: 1.65; }
 .asset-inspector dl { display: grid; gap: 7px; margin: 0 0 22px; padding: 16px 0; border-top: 1px solid #bfd2c7; border-bottom: 1px solid #bfd2c7; }
 .asset-inspector dl div { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; }
