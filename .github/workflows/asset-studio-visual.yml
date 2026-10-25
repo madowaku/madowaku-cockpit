@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - feat/mgsf-m1-5-asset-studio
     paths:
       - 'src/App.tsx'
       - 'src/AssetStudio.tsx'
