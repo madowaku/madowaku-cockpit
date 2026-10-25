@@ -4,10 +4,10 @@ This is a stacked, isolated extension of MGSF-M1.5 (PR #5). Parent feature is no
 
 ## What is actual vs illustrative?
 
-- **Actual source-hosted image**: two curated Game-icons.net icon SVGs, displayed with a visibly labelled `ACTUAL ICON / SOURCE HOSTED` marker, using explicit provider URLs.
+- **Actual source-hosted image**: two original CC BY 3.0 Game-icons.net SVGs preserved under `public/asset-previews/`, labelled `ACTUAL ICON / CC BY ORIGINAL`. Originals were fetched from `game-icons/icons` and retain per-asset author/source/credit records.
 - **Decorative placeholder**: all other Kenney packs use CSS shapes visibly labelled `CONCEPT ART / NOT ACTUAL ASSET`. Do not imply these represent specific asset pack contents.
-- Remote preview errors do not grant trust; the individual source listing remains the authority.
-- Preview hotlinking is experimental; if the provider blocks embedding, use a reviewed locally cached asset or revert to the illustration. Do not scrape or redistribute media without checking permission.
+- Local SVGs do not grant license clearance; the individual source listing and CC BY attribution remain the authority.
+- Remote preview hotlinking failed in CI and was replaced by locally retained original CC BY SVGs with provenance. Their source and attribution must ship with the software. Do not redistribute modified assets without checking license obligations.
 
 ## MAF compatibility
 
@@ -22,21 +22,21 @@ This is a stacked, isolated extension of MGSF-M1.5 (PR #5). Parent feature is no
 
 `scripts/asset-studio-browser-smoke.mjs` uses the Node 22 built-in WebSocket client and Chrome DevTools Protocol, with no browser automation library installation. The visual-evidence workflow launches Chrome with a local debug port. The smoke test exercises:
 - Japanese heading and asset/source counts
-- Actual icon preview load and provenance markers
+- Original local icon preview load and provenance markers
 - Live search narrowing
 - Style intent button state
 - Candidate add/remove and localStorage persistence
 - 320 / 390px horizontal overflow and narrow back button wrapping
 
-CI uploads actual screenshots and `browser-smoke.txt` logs. Browser tests are only a **smoke**: they do not replace keyboard-only exploratory QA, credit audit, accessibility scanning or Windows acceptance. Remote source URLs must be checked before release; third-party links can change.
+CI uploads actual screenshots and `browser-smoke.txt` logs. Browser tests are only a **smoke**: they do not replace keyboard-only exploratory QA, credit audit, accessibility scanning or Windows acceptance. Original upstream source URLs must still be checked before release; third-party pages can change.
 
 ## Release gates
 
 - [ ] PR #5 accepted and merged or deliberately rebased
 - [ ] TypeScript/Vite build and unit tests pass
-- [ ] CDP browser smoke pass with evidence (including remote actual-icon images)
+- [ ] CDP browser smoke pass with evidence (including local original icon loads)
 - [ ] Screenshot and direct interaction human review at 1440, 768, 390, and 320px
 - [ ] Keyboard, focus, reduced-motion, source-link navigation, attribution correctness reviewed
-- [ ] Decide whether remote hotlink preview should be replaced by permission-reviewed local preview assets
+- [ ] Confirm bundled original CC BY SVGs retain license and author attributions in release materials
 
 No rights clearance or Godot auto-import is claimed.
