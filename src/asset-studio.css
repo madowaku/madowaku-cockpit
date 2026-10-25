@@ -12,7 +12,7 @@
   min-height: 100vh;
   background: var(--as-paper);
   color: var(--as-ink);
-  font-family: "Hiragino Sans", "Yu Gothic UI", "Noto Sans JP", "Segoe UI", sans-serif;
+  font-family: "Hiragino Sans", "Yu Gothic UI", "Noto Sans CJK JP", "Noto Sans JP", "Segoe UI", sans-serif;
   font-size: 14px;
   letter-spacing: .005em;
   line-height: 1.5;
