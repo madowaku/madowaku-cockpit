@@ -18,7 +18,7 @@ export type AssetEntry = {
   godotHint: string;
   symbol: string;
   tone: string;
-  /** Verified static image of the actual asset, not a generated depiction. */
+  /** Locally retained original CC BY icon from game-icons/icons, not a generated depiction. */
   previewUrl?: string;
 };
 
@@ -103,7 +103,7 @@ export const CURATED_ASSETS: readonly AssetEntry[] = [
     rights: 'attribution-required', license: 'CC BY 3.0', author: 'Lorc',
     creditText: 'Crossed swords icon by Lorc, via game-icons.net, licensed under CC BY 3.0. https://game-icons.net/1x1/lorc/crossed-swords.html',
     godotHint: '原本のSVG/PNGを取得しres://assets/icons/へ。必要なクレジットをゲーム内のCredits画面に追加。',
-    symbol: '⚔', tone: 'amber', previewUrl: 'https://game-icons.net/icons/ffffff/000000/1x1/lorc/crossed-swords.svg'
+    symbol: '⚔', tone: 'amber', previewUrl: '/asset-previews/crossed-swords.svg'
   },
   {
     id: 'game-icons-two-handed-sword', title: 'Two handed sword', source: 'Game-icons.net', kind: 'icons', style: 'Fantasy',
@@ -113,7 +113,7 @@ export const CURATED_ASSETS: readonly AssetEntry[] = [
     rights: 'attribution-required', license: 'CC BY 3.0', author: 'Delapouite',
     creditText: 'Two handed sword icon by Delapouite, via game-icons.net, licensed under CC BY 3.0. https://game-icons.net/1x1/delapouite/two-handed-sword.html',
     godotHint: '原本のSVG/PNGを取得しres://assets/icons/へ。必要なクレジットをゲーム内のCredits画面に追加。',
-    symbol: '†', tone: 'violet', previewUrl: 'https://game-icons.net/icons/ffffff/000000/1x1/delapouite/two-handed-sword.svg'
+    symbol: '†', tone: 'violet', previewUrl: '/asset-previews/two-handed-sword.svg'
   },
   {
     id: 'kenney-development-essentials', title: 'Development Essentials', source: 'Kenney', kind: '2d', style: 'Prototype',
