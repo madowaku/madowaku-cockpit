@@ -11,7 +11,8 @@ Give a non-expert game maker one calm, visual flow: **discover → check provena
 3. Choose **詳細を見る** to inspect the **individual asset** URL and licensing evidence.
 4. Choose **+ 候補に追加** to build a shortlist. Shortlist IDs are stored under `madowaku-mgsf-asset-studio-shortlist-v1`, separate from legacy Cockpit project backup.
 5. Choose **導入メモをコピー** or **Markdownに保存**, then manually obtain source files and test in Godot.
-6. Visit the eight provider directories at the bottom when the curated list does not cover the desired format.
+6. Select **AI調査指示をコピー** to copy a research-only prompt with the current query and all eight provider URLs for Codex or Claude Code. **The studio does not execute AI searches.**
+7. Visit the eight provider directories at the bottom when the curated list does not cover the desired format.
 
 The current previews are intentionally **decorative CSS, not screenshots of downloaded assets**. The interface explicitly says so. There are no additional font, image or icon library dependencies.
 
@@ -31,7 +32,7 @@ None of these notes is legal advice. This pilot does not automate or certify com
 
 ## Local architecture and compatibility
 
-- `src/assetCatalog.ts`: portable typed source/catalog data, filtering, status gating and markdown handoff.
+- `src/assetCatalog.ts`: portable typed source/catalog data, filtering, status gating, copy-only AI research prompt and markdown handoff.
 - `src/AssetStudio.tsx`: screen state, local selection, outbound source links, copy/download actions.
 - `src/asset-studio.css`: namespaced new visual system, no global changes to Cockpit.
 - `src/App.tsx`: one launcher and conditional render; no changes to project state, backups, prompt builders or MCP bridge.
@@ -64,6 +65,7 @@ Manual (human review remains required):
 - [ ] Keyboard-only Tab / Shift+Tab: skip link, category filters, source links, add/remove buttons and export.
 - [ ] Search `RPG`, `3D`, an unmatched term, reset, filter by kind and CC0.
 - [ ] Add two packs, remove one, reload; check shortlist persistence without touching Cockpit backup.
+- [ ] Copy the AI research prompt; verify all 8 sources, current category/query, license verification and no auto-download instructions.
 - [ ] Copy and save markdown, verify URLs / evidence / unchecked quality gates.
 - [ ] Disable clipboard access and try again: should explain that Markdown download is the fallback.
 - [ ] Disable localStorage or corrupt shortlist JSON and verify no crash.
