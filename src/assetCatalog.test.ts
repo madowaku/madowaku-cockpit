@@ -68,7 +68,7 @@ describe('MGSF Asset Studio catalog', () => {
     expect(previewed).toHaveLength(2);
     for (const item of previewed) {
       expect(item.source).toBe('Game-icons.net');
-      expect(item.previewUrl).toContain('game-icons.net/icons/');
+      expect(item.previewUrl).toContain('/asset-previews/');
       expect(item.previewUrl).toContain(item.url.split('/').pop()?.replace('.html', '.svg'));
     }
     expect(CURATED_ASSETS.filter((item) => item.source === 'Kenney').every((item) => !item.previewUrl)).toBe(true);
