@@ -3,6 +3,9 @@ import {
   ASSET_SOURCES,
   CURATED_ASSETS,
   KIND_LABELS,
+  STYLE_INTENTS,
+  assessStyleMatch,
+  type StyleIntent,
   createGodotHandoff,
   createAssetResearchPrompt,
   filterAssets,
@@ -39,11 +42,16 @@ export default function AssetStudio({ onBack }: Props) {
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState<AssetKind | 'all'>('all');
   const [readyOnly, setReadyOnly] = useState(false);
+  const [styleIntent, setStyleIntent] = useState<StyleIntent>('pixel');
   const [shortlist, setShortlist] = useState<string[]>(loadShortlist);
   const [selectedId, setSelectedId] = useState(CURATED_ASSETS[0].id);
   const [feedback, setFeedback] = useState('');
 
-  const matches = useMemo(() => filterAssets(CURATED_ASSETS, query, kind, readyOnly), [query, kind, readyOnly]);
+  const matches = useMemo(() => {
+    const filtered = filterAssets(CURATED_ASSETS, query, kind, readyOnly);
+    const weights = { strong: 2, possible: 1, low: 0 };
+    return [...filtered].sort((a, b) => weights[assessStyleMatch(b, styleIntent).level] - weights[assessStyleMatch(a, styleIntent).level]);
+  }, [query, kind, readyOnly, styleIntent]);
   const selected = CURATED_ASSETS.find((item) => item.id === selectedId) ?? CURATED_ASSETS[0];
   const chosen = CURATED_ASSETS.filter((item) => shortlist.includes(item.id));
   const handoff = useMemo(() => createGodotHandoff(chosen), [shortlist]);
@@ -165,7 +173,18 @@ export default function AssetStudio({ onBack }: Props) {
                 {KIND_LABELS[category]} <span>{category === 'all' ? CURATED_ASSETS.length : CURATED_ASSETS.filter((asset) => asset.kind === category).length}</span>
               </button>
             ))}
-            <span className="asset-filter-hint">サンプル画像ではなく装飾イラストを表示しています</span>
+            <span className="asset-filter-hint">実素材の画像があるもののみ実物表示。それ以外は装飾イラストです</span>
+          </div>
+
+          <div className="asset-style-compass">
+            <div className="asset-style-head"><span>MAF STYLE BRIDGE / RULE-BASED PILOT</span><strong>どんな画風で作りたい？</strong>
+              <p>タグとの一致で候補の順番を変えます。AIの画像解析ではなく、理由が追える簡易マッチングです。</p></div>
+            <div className="asset-style-options" role="group" aria-label="画風の方向性">
+              {(Object.keys(STYLE_INTENTS) as StyleIntent[]).map((intent) => (
+                <button key={intent} type="button" aria-pressed={styleIntent === intent}
+                  className={styleIntent === intent ? 'active' : ''} onClick={() => setStyleIntent(intent)}>{STYLE_INTENTS[intent].label}</button>
+              ))}
+            </div>
           </div>
 
           <div className="asset-research-guide">
@@ -187,14 +206,20 @@ export default function AssetStudio({ onBack }: Props) {
               ) : matches.map((asset, index) => {
                 const saved = shortlist.includes(asset.id);
                 const verdict = licenseVerdict(asset.rights);
+                const styleMatch = assessStyleMatch(asset, styleIntent);
                 return (
                   <article className={selectedId === asset.id ? 'asset-card asset-card-selected' : 'asset-card'} key={asset.id}>
                     <div className={'asset-card-visual asset-tone-' + asset.tone} aria-label="装飾イラスト。実際の素材画像ではありません">
                       <span className="asset-card-visual-count">A/{String(index + 1).padStart(2, '0')}</span>
-                      <span className="asset-card-symbol" aria-hidden="true">{asset.symbol}</span>
+
+                      {asset.previewUrl ? (
+                        <img className="asset-real-preview" src={asset.previewUrl} loading="lazy" alt={asset.title + ' の実素材プレビュー'} referrerPolicy="no-referrer" onError={(event) => { event.currentTarget.hidden = true; }} />
+                      ) : <span className="asset-card-symbol" aria-hidden="true">{asset.symbol}</span>}
+                      <span className="asset-preview-provenance">{asset.previewUrl ? 'ACTUAL ICON / SOURCE HOSTED' : 'CONCEPT ART / NOT ACTUAL ASSET'}</span>
                       <span className="asset-card-watermark" aria-hidden="true">{asset.kind.toUpperCase()}</span>
                     </div>
                     <div className="asset-card-body">
+                      <div className="asset-style-verdict" data-level={styleMatch.level} title={'一致タグ: ' + (styleMatch.evidence.join(', ') || 'なし')}>{styleMatch.label} · {styleMatch.evidence.length ? styleMatch.evidence.join(' / ') : '一致タグなし'}</div>
                       <div className="asset-card-meta"><span>{asset.source} / {asset.style}</span><span className={verdict.type === 'ready' ? 'asset-license-mark' : 'asset-license-mark asset-license-caution'}>{verdict.label}</span></div>
                       <h3>{asset.title}</h3>
                       <p>{asset.description}</p>
@@ -224,6 +249,8 @@ export default function AssetStudio({ onBack }: Props) {
                   <div><dt>表示ライセンス</dt><dd>{selected.license}</dd></div>
                 </dl>
                 {selected.creditText && <div className="asset-credit-note"><strong>必要なクレジット（候補）</strong><p>{selected.creditText}</p></div>}
+                <p className="asset-inspector-heading">STYLE MATCH / RULE EVIDENCE</p>
+                <p className="asset-godot-note">{assessStyleMatch(selected, styleIntent).label}。一致タグ: {assessStyleMatch(selected, styleIntent).evidence.join(' / ') || 'なし'}。{assessStyleMatch(selected, styleIntent).rationale}</p>
                 <p className="asset-inspector-heading">GODOT IMPORT NOTE</p>
                 <p className="asset-godot-note">{selected.godotHint}</p>
                 <a href={selected.url} target="_blank" rel="noopener noreferrer" className="asset-source-cta">素材ページを開く <span aria-hidden="true">↗</span></a>
