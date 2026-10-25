@@ -53,7 +53,10 @@ export default function AssetStudio({ onBack }: Props) {
   const matches = useMemo(() => {
     const filtered = filterAssets(CURATED_ASSETS, query, kind, readyOnly);
     const weights = { strong: 2, possible: 1, low: 0 };
-    return [...filtered].sort((a, b) => weights[assessStyleMatch(b, styleIntent).level] - weights[assessStyleMatch(a, styleIntent).level]);
+    return [...filtered].sort((a, b) =>
+      weights[assessStyleMatch(b, styleIntent).level] - weights[assessStyleMatch(a, styleIntent).level]
+      || Number(Boolean(getPreviewGallery(b.id) || b.previewUrl)) - Number(Boolean(getPreviewGallery(a.id) || a.previewUrl))
+    );
   }, [query, kind, readyOnly, styleIntent]);
   const selected = CURATED_ASSETS.find((item) => item.id === selectedId) ?? CURATED_ASSETS[0];
   const selectedGallery = getPreviewGallery(selected.id);
@@ -124,7 +127,7 @@ export default function AssetStudio({ onBack }: Props) {
           <span className="asset-mark" aria-hidden="true">✳</span>
           <div><strong>madowaku<span className="asset-wordmark-accent">.</span></strong><small>ASSET STUDIO / MGSF</small></div>
         </div>
-        <div className="asset-topmeta"><span className="asset-live-dot" /> LOCAL-FIRST <span className="asset-topmeta-divider">/</span> M1.5 PILOT</div>
+        <div className="asset-topmeta"><span className="asset-live-dot" /> LOCAL-FIRST <span className="asset-topmeta-divider">/</span> M1.5.2 LAB</div>
       </header>
 
       <main className="asset-page">
@@ -166,7 +169,7 @@ export default function AssetStudio({ onBack }: Props) {
               <h2 id="asset-results-heading">素材を選ぶ<span className="asset-heading-period">.</span></h2>
               <p>厳選した実在素材を比較。Kenneyの一部は原本PNGの実例、その他は装飾イラストです。</p>
             </div>
-            <div className="asset-section-count"><strong>{matches.length.toString().padStart(2, '0')}</strong><span>PACKS FOUND</span></div>
+            <div className="asset-section-count"><strong>{matches.length.toString().padStart(2, '0')}</strong><span>ASSETS FOUND</span></div>
           </div>
 
           <div className="asset-search-bar">
@@ -347,7 +350,7 @@ export default function AssetStudio({ onBack }: Props) {
           </div>
         </section>
 
-        <footer className="asset-footer"><span>✳ madowaku / ASSET STUDIO</span><p>DISCOVER WELL. CREDIT RIGHT. MAKE MORE.</p><span>© MGSF M1.5 • LOCAL PILOT</span></footer>
+        <footer className="asset-footer"><span>✳ madowaku / ASSET STUDIO</span><p>DISCOVER WELL. CREDIT RIGHT. MAKE MORE.</p><span>© MGSF M1.5.2 • LOCAL PILOT</span></footer>
       </main>
       <p className="asset-announcer" role="status" aria-live="polite">{feedback}</p>
     </div>
