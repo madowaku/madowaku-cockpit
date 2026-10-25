@@ -138,7 +138,7 @@ export default function AssetStudio({ onBack }: Props) {
             <div>
               <p className="asset-section-kicker">THE COLLECTION <span> / 厳選素材</span></p>
               <h2 id="asset-results-heading">素材を選ぶ<span className="asset-heading-period">.</span></h2>
-              <p>実在する素材パックの個別ページを登録。検索はこの厳選カタログ内で行います。</p>
+              <p>実在する素材パック・アイコンの個別ページを登録。検索はこの厳選カタログ内で行います。</p>
             </div>
             <div className="asset-section-count"><strong>{matches.length.toString().padStart(2, '0')}</strong><span>PACKS FOUND</span></div>
           </div>
@@ -195,7 +195,7 @@ export default function AssetStudio({ onBack }: Props) {
                       <span className="asset-card-watermark" aria-hidden="true">{asset.kind.toUpperCase()}</span>
                     </div>
                     <div className="asset-card-body">
-                      <div className="asset-card-meta"><span>{asset.source} / {asset.style}</span><span className="asset-license-mark">{verdict.label}</span></div>
+                      <div className="asset-card-meta"><span>{asset.source} / {asset.style}</span><span className={verdict.type === 'ready' ? 'asset-license-mark' : 'asset-license-mark asset-license-caution'}>{verdict.label}</span></div>
                       <h3>{asset.title}</h3>
                       <p>{asset.description}</p>
                       <div className="asset-tags">{asset.tags.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}</div>
@@ -216,13 +216,14 @@ export default function AssetStudio({ onBack }: Props) {
               <section className="asset-inspector">
                 <div className="asset-panel-top"><span>DETAIL / SELECTED</span><span className="asset-panel-asterisk">✳</span></div>
                 <h3>{selected.title}</h3>
-                <span className="asset-verdict-ready">{licenseVerdict(selected.rights).label}</span>
+                <span className={licenseVerdict(selected.rights).type === 'ready' ? 'asset-verdict-ready' : 'asset-verdict-caution'}>{licenseVerdict(selected.rights).label}</span>
                 <p className="asset-inspector-note">{licenseVerdict(selected.rights).note}</p>
                 <dl>
                   <div><dt>出典</dt><dd>{selected.source}</dd></div>
                   <div><dt>ジャンル</dt><dd>{KIND_LABELS[selected.kind]}</dd></div>
                   <div><dt>表示ライセンス</dt><dd>{selected.license}</dd></div>
                 </dl>
+                {selected.creditText && <div className="asset-credit-note"><strong>必要なクレジット（候補）</strong><p>{selected.creditText}</p></div>}
                 <p className="asset-inspector-heading">GODOT IMPORT NOTE</p>
                 <p className="asset-godot-note">{selected.godotHint}</p>
                 <a href={selected.url} target="_blank" rel="noopener noreferrer" className="asset-source-cta">素材ページを開く <span aria-hidden="true">↗</span></a>
