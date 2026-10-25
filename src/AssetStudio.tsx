@@ -215,7 +215,7 @@ export default function AssetStudio({ onBack }: Props) {
                       {asset.previewUrl ? (
                         <img className="asset-real-preview" src={asset.previewUrl} loading="lazy" alt={asset.title + ' の実素材プレビュー'} referrerPolicy="no-referrer" onError={(event) => { event.currentTarget.hidden = true; }} />
                       ) : <span className="asset-card-symbol" aria-hidden="true">{asset.symbol}</span>}
-                      <span className="asset-preview-provenance">{asset.previewUrl ? 'ACTUAL ICON / SOURCE HOSTED' : 'CONCEPT ART / NOT ACTUAL ASSET'}</span>
+                      <span className="asset-preview-provenance">{asset.previewUrl ? 'ACTUAL ICON / CC BY ORIGINAL' : 'CONCEPT ART / NOT ACTUAL ASSET'}</span>
                       <span className="asset-card-watermark" aria-hidden="true">{asset.kind.toUpperCase()}</span>
                     </div>
                     <div className="asset-card-body">
