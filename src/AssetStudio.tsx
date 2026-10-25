@@ -213,7 +213,7 @@ export default function AssetStudio({ onBack }: Props) {
                       <span className="asset-card-visual-count">A/{String(index + 1).padStart(2, '0')}</span>
 
                       {asset.previewUrl ? (
-                        <img className="asset-real-preview" src={asset.previewUrl} loading="lazy" alt={asset.title + ' の実素材プレビュー'} referrerPolicy="no-referrer" onError={(event) => { event.currentTarget.hidden = true; }} />
+                        <img className="asset-real-preview" src={asset.previewUrl} loading="eager" alt={asset.title + ' の実素材プレビュー'} referrerPolicy="no-referrer" onError={(event) => { event.currentTarget.hidden = true; }} />
                       ) : <span className="asset-card-symbol" aria-hidden="true">{asset.symbol}</span>}
                       <span className="asset-preview-provenance">{asset.previewUrl ? 'ACTUAL ICON / CC BY ORIGINAL' : 'CONCEPT ART / NOT ACTUAL ASSET'}</span>
                       <span className="asset-card-watermark" aria-hidden="true">{asset.kind.toUpperCase()}</span>
