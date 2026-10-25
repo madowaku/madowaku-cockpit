@@ -28,7 +28,7 @@ describe('MGSF-MAF image feature evidence', () => {
   it('compares MAF palette snapshot using explicit RGB distance, not model probabilities', () => {
     const palette=MAF_PALETTE_SNAPSHOT.pixel;
     expect(palette.label).toBe('Moonlit Pixel');
-    const result=analyzeRgba(new Uint8ClampedArray([23,28,51,255]));
+    const result=analyzeRgba(new Uint8ClampedArray([224,200,162,255]));
     const ranked=compareMafPalettes(result);
     expect(ranked).toHaveLength(4);
     expect(ranked[0].id).toBe('pixel');
