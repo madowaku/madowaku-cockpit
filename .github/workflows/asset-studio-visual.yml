@@ -9,6 +9,7 @@ on:
       - 'src/AssetStudio.tsx'
       - 'src/assetCatalog.ts'
       - 'src/asset-studio.css'
+      - 'scripts/asset-studio-browser-smoke.mjs'
       - '.github/workflows/asset-studio-visual.yml'
   workflow_dispatch:
 
@@ -67,6 +68,20 @@ jobs:
             test -s "visual-evidence/$label.png"
           done
           file visual-evidence/*.png
+
+      - name: Run real-browser interaction checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium)"
+          "$BROWSER" --headless=new --no-sandbox --disable-dev-shm-usage --disable-gpu \
+            --remote-debugging-port=9222 --remote-debugging-address=127.0.0.1 \
+            --user-data-dir=/tmp/mgsf-browser-smoke about:blank > /tmp/mgsf-chrome.log 2>&1 &
+          CHROME_PID=$!
+          npm run dev -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/mgsf-vite.log 2>&1 &
+          DEV_PID=$!
+          trap 'kill "$CHROME_PID" "$DEV_PID" 2>/dev/null || true' EXIT
+          node scripts/asset-studio-browser-smoke.mjs | tee visual-evidence/browser-smoke.txt
 
       - name: Attach browser evidence for manual QA
         if: always()
