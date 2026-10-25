@@ -24,7 +24,7 @@ The current previews are intentionally **decorative CSS, not screenshots of down
 - Game-icons.net describes CC BY 3.0 and an author credit obligation: https://game-icons.net/about.html
 - Freesound has multiple CC licenses, including non-commercial cases: https://freesound.org/help/faq/
 - Mixamo allows royalty-free characters/animation in commercial games; redistribution of raw assets is a separate concern. https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html
-- Godot Asset Library add-ons have individual open-source licenses, distinct from Godot engine MIT: https://docs.godotengine.org/en/stable/community/asset_library/what_is_assetlib.html
+- The **Godot Asset Store** supersedes the deprecated Asset Library (which stays for older releases); verify individual add-on terms: https://godotengine.org/article/introducing-the-godot-asset-store/ and https://store.godotengine.org/
 - Lospec, itch.io and OpenGameArt items are **not** automatically approved. Find author, license terms and source page first.
 - `licenseVerdict` returns `ready`, `caution` or `blocked`. Only evidenced CC0 yields `ready`. `createGodotHandoff` preserves source URLs and manual review checkboxes.
 
@@ -62,6 +62,7 @@ Automated:
 Manual (human review remains required):
 - [ ] Open Cockpit, open/close Asset Studio, ensure original project data remains unchanged.
 - [ ] At 1440, 768, 390 and 320 px: inspect hero, cards, 8 directories, inspector, tray and no horizontal overflow.
+- [ ] Verify **Japanese characters actually render** in CI screenshots (CI installs Noto CJK fonts) and check type hierarchy.
 - [ ] Keyboard-only Tab / Shift+Tab: skip link, category filters, source links, add/remove buttons and export.
 - [ ] Search `RPG`, `3D`, an unmatched term, reset, filter by kind and CC0.
 - [ ] Add two packs, remove one, reload; check shortlist persistence without touching Cockpit backup.
