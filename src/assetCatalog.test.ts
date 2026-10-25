@@ -6,6 +6,7 @@ describe('MGSF Asset Studio catalog', () => {
     expect(ASSET_SOURCES).toHaveLength(8);
     expect(new Set(ASSET_SOURCES.map((source) => source.id)).size).toBe(8);
     expect(ASSET_SOURCES.filter((source) => source.status === 'source-verified').map((source) => source.id)).toEqual(['kenney']);
+    expect(ASSET_SOURCES.find((source) => source.id === 'godot')?.url).toBe('https://store.godotengine.org/');
   });
 
   it('keeps provenance for every curated pack and avoids invented local files', () => {
