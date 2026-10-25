@@ -38,6 +38,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify Kenney original PNG blob hashes
+        run: node scripts/verify-kenney-blob-shas.mjs
+
       - name: Install Japanese fonts for faithful screenshots
         run: |
           sudo apt-get update -qq
