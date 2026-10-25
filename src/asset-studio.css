@@ -359,6 +359,11 @@
   .asset-footer { padding: 23px 0; }
 }
 @media (max-width: 365px) {
+  .asset-topbar { grid-template-columns: auto minmax(0,1fr); gap: 6px; padding: 10px 10px; }
+  .asset-back { white-space: nowrap; font-size: 10px !important; padding: 9px 9px; }
+  .asset-back span { margin-right: 2px; }
+  .asset-wordmark { justify-self: end; }
+  .asset-wordmark small { font-size: 7px; letter-spacing: .06em; }
   .asset-card { grid-template-columns: 100px minmax(0,1fr); }
   .asset-card-visual { min-height: 260px; }
   .asset-card-symbol { font-size: 55px; }
