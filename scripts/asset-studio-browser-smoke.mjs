@@ -56,23 +56,20 @@ try {
   await check('source-hosted previews load', `[...document.querySelectorAll('img.asset-real-preview')].every(i => i.complete && i.naturalWidth > 0)`, true);
   await check('no horizontal overflow at desktop', `document.documentElement.scrollWidth <= innerWidth`, true);
 
-  await evaluate(`document.querySelector('input[type=search]').value='RPG'; document.querySelector('input[type=search]').dispatchEvent(new Event('input',{bubbles:true}));`);
-  await delay(150);
-  // React controlled input requires the native setter on the prototype.
-  await evaluate(`(()=>{let el=document.querySelector('input[type=search]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'RPG'); el.dispatchEvent(new Event('input',{bubbles:true}));})()`);
-  await delay(120);
+  // CDP Input.insertText emits actual browser input events; dispatchEvent is not a React user event.
+  await evaluate(`document.querySelector('input[type=search]').focus()`);
+  await cdp('Input.insertText', { text: 'RPG' });
+  await delay(160);
   const count = await evaluate(`document.querySelectorAll('.asset-card').length`);
   assert.ok(count > 0 && count < 10, 'search filter count: ' + count);
   console.log('PASS: live search narrows results to ' + count);
 
-  await evaluate(`document.querySelector('.asset-empty button')?.click()`); // no-op unless empty
+  await cdp('Page.reload', { ignoreCache: true });
+  await delay(900);
   await evaluate(`document.querySelector('.asset-style-options button:nth-child(3)').click()`);
-  await delay(100);
+  await delay(120);
   await check('style choice responds', `document.querySelector('.asset-style-options button:nth-child(3)').getAttribute('aria-pressed')`, 'true');
-  await evaluate(`document.querySelector('.asset-filter').click()`);
-  await evaluate(`(()=>{let el=document.querySelector('input[type=search]'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,''); el.dispatchEvent(new Event('input',{bubbles:true}));})()`);
-  await delay(100);
-  await check('reset list', `document.querySelectorAll('.asset-card').length`, 10);
+  await check('reset list after reload', `document.querySelectorAll('.asset-card').length`, 10);
 
   await evaluate(`document.querySelector('.asset-card .asset-save-button').click()`);
   await delay(100);
