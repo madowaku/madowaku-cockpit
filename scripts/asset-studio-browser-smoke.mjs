@@ -50,9 +50,11 @@ try {
   await cdp('Runtime.enable');
   await delay(1500);
   await check('Japanese heading', `document.querySelector('#asset-hero-title')?.textContent.includes('アイデアに')`, true);
-  await check('10 curated assets', `document.querySelectorAll('.asset-card').length`, 10);
+  await check('12 curated assets', `document.querySelectorAll('.asset-card').length`, 12);
   await check('8 official sources', `document.querySelectorAll('.asset-provider').length`, 8);
-  await check('two real asset previews', `document.querySelectorAll('img.asset-real-preview').length`, 2);
+  await check('two CC BY icon previews', `document.querySelectorAll('img.asset-real-preview').length`, 2);
+  await check('13 original Kenney PNG samples', `document.querySelectorAll('img.asset-sprite-sample').length`, 13);
+  await check('original Kenney PNGs loaded', `[...document.querySelectorAll('img.asset-sprite-sample')].every(i => i.complete && i.naturalWidth > 0)`, true);
   await check('source-hosted previews load', `[...document.querySelectorAll('img.asset-real-preview')].every(i => i.complete && i.naturalWidth > 0)`, true);
   await check('no horizontal overflow at desktop', `document.documentElement.scrollWidth <= innerWidth`, true);
 
@@ -61,7 +63,7 @@ try {
   await cdp('Input.insertText', { text: 'RPG' });
   await delay(160);
   const count = await evaluate(`document.querySelectorAll('.asset-card').length`);
-  assert.ok(count > 0 && count < 10, 'search filter count: ' + count);
+  assert.ok(count > 0 && count < 12, 'search filter count: ' + count);
   console.log('PASS: live search narrows results to ' + count);
 
   await cdp('Page.reload', { ignoreCache: true });
@@ -69,7 +71,16 @@ try {
   await evaluate(`document.querySelector('.asset-style-options button:nth-child(3)').click()`);
   await delay(120);
   await check('style choice responds', `document.querySelector('.asset-style-options button:nth-child(3)').getAttribute('aria-pressed')`, 'true');
-  await check('reset list after reload', `document.querySelectorAll('.asset-card').length`, 10);
+  await check('reset list after reload', `document.querySelectorAll('.asset-card').length`, 12);
+
+  // User can inspect actual sprite pixels before bringing a pack to Godot.
+  await evaluate(`([...document.querySelectorAll('.asset-card')].find(card=>card.querySelector('h3')?.textContent==='UI Pack - Adventure')).querySelector('.asset-outline-button').click()`);
+  await delay(100);
+  await check('visual inspector shows selected Kenney sample count', `document.querySelector('.asset-analyze-button')?.textContent.includes('2枚')`, true);
+  await evaluate(`document.querySelector('.asset-analyze-button').click()`);
+  await delay(350);
+  await check('real canvas pixel evidence calculated', `document.querySelector('.asset-analysis-result')?.textContent.includes('MAFパレットとのRGB色差')`, true);
+  await check('real preview palettes rendered', `document.querySelectorAll('.asset-analysis-swatches span').length > 0`, true);
 
   await evaluate(`document.querySelector('.asset-card .asset-save-button').click()`);
   await delay(100);

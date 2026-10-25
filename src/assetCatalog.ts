@@ -116,6 +116,20 @@ export const CURATED_ASSETS: readonly AssetEntry[] = [
     symbol: '†', tone: 'violet', previewUrl: '/asset-previews/two-handed-sword.svg'
   },
   {
+    id: 'kenney-pixel-adventure-ui', title: 'UI Pack - Pixel Adventure', source: 'Kenney', kind: 'ui', style: 'Pixel art',
+    tags: ['pixel', 'UI', 'RPG', 'adventure', 'retro', 'tiles'], description: 'レトロ調のウィンドウや装飾をまとめたピクセルUIパック。',
+    url: 'https://kenney.nl/assets/ui-pack-pixel-adventure', evidenceUrl: 'https://kenney.nl/assets/ui-pack-pixel-adventure',
+    rights: 'verified-cc0', license: 'CC0', godotHint: 'パネルやボタンを原寸整数倍で描画し、Theme/TextureRectのフィルタを確認。',
+    symbol: '▦', tone: 'lavender'
+  },
+  {
+    id: 'kenney-ui-pack', title: 'UI Pack', source: 'Kenney', kind: 'ui', style: 'Clean UI',
+    tags: ['UI', 'buttons', 'panels', 'prototype', 'game interface'], description: 'ボタン・パネル・操作UIを短時間で検証できる汎用セット。',
+    url: 'https://kenney.nl/assets/ui-pack', evidenceUrl: 'https://kenney.nl/assets/ui-pack',
+    rights: 'verified-cc0', license: 'CC0', godotHint: 'res://assets/ui/ に保存し、StyleBoxTexture の9-sliceや表示倍率を検証。',
+    symbol: '▤', tone: 'blue'
+  },
+  {
     id: 'kenney-development-essentials', title: 'Development Essentials', source: 'Kenney', kind: '2d', style: 'Prototype',
     tags: ['textures', 'prototype', 'development'], description: '制作初期の検証を進めるためのシンプルなテクスチャ素材。',
     url: 'https://kenney.nl/assets/development-essentials', evidenceUrl: 'https://kenney.nl/assets/development-essentials',

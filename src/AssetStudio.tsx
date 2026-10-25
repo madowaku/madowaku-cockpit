@@ -12,6 +12,8 @@ import {
   licenseVerdict,
   type AssetKind
 } from './assetCatalog';
+import { getPreviewGallery } from './kenneyPreviews';
+import { analyzeLocalPreviews, compareMafPalettes, type VisualEvidence } from './mafImageEvidence';
 import './asset-studio.css';
 
 type Props = { onBack: () => void };
@@ -46,13 +48,20 @@ export default function AssetStudio({ onBack }: Props) {
   const [shortlist, setShortlist] = useState<string[]>(loadShortlist);
   const [selectedId, setSelectedId] = useState(CURATED_ASSETS[0].id);
   const [feedback, setFeedback] = useState('');
+  const [visualCheck, setVisualCheck] = useState<{ assetId: string; status: 'loading' | 'ok' | 'error'; evidence?: VisualEvidence } | null>(null);
 
   const matches = useMemo(() => {
     const filtered = filterAssets(CURATED_ASSETS, query, kind, readyOnly);
     const weights = { strong: 2, possible: 1, low: 0 };
-    return [...filtered].sort((a, b) => weights[assessStyleMatch(b, styleIntent).level] - weights[assessStyleMatch(a, styleIntent).level]);
+    return [...filtered].sort((a, b) =>
+      weights[assessStyleMatch(b, styleIntent).level] - weights[assessStyleMatch(a, styleIntent).level]
+      || Number(Boolean(getPreviewGallery(b.id) || b.previewUrl)) - Number(Boolean(getPreviewGallery(a.id) || a.previewUrl))
+    );
   }, [query, kind, readyOnly, styleIntent]);
   const selected = CURATED_ASSETS.find((item) => item.id === selectedId) ?? CURATED_ASSETS[0];
+  const selectedGallery = getPreviewGallery(selected.id);
+  const activeVisual = visualCheck?.assetId === selected.id ? visualCheck : null;
+  const comparedPalettes = activeVisual?.evidence ? compareMafPalettes(activeVisual.evidence) : [];
   const chosen = CURATED_ASSETS.filter((item) => shortlist.includes(item.id));
   const handoff = useMemo(() => createGodotHandoff(chosen), [shortlist]);
   const openIssues = chosen.filter((item) => licenseVerdict(item.rights).type !== 'ready').length;
@@ -89,6 +98,18 @@ export default function AssetStudio({ onBack }: Props) {
     }
   }
 
+  async function inspectOriginalSprites() {
+    if (!selectedGallery) return;
+    const targetId = selected.id;
+    setVisualCheck({ assetId: targetId, status: 'loading' });
+    try {
+      const evidence = await analyzeLocalPreviews(selectedGallery.samples.map((sample) => sample.src));
+      setVisualCheck({ assetId: targetId, status: 'ok', evidence });
+    } catch {
+      setVisualCheck({ assetId: targetId, status: 'error' });
+    }
+  }
+
   function resetSearch() {
     setQuery('');
     setKind('all');
@@ -106,7 +127,7 @@ export default function AssetStudio({ onBack }: Props) {
           <span className="asset-mark" aria-hidden="true">✳</span>
           <div><strong>madowaku<span className="asset-wordmark-accent">.</span></strong><small>ASSET STUDIO / MGSF</small></div>
         </div>
-        <div className="asset-topmeta"><span className="asset-live-dot" /> LOCAL-FIRST <span className="asset-topmeta-divider">/</span> M1.5 PILOT</div>
+        <div className="asset-topmeta"><span className="asset-live-dot" /> LOCAL-FIRST <span className="asset-topmeta-divider">/</span> M1.5.2 LAB</div>
       </header>
 
       <main className="asset-page">
@@ -146,9 +167,9 @@ export default function AssetStudio({ onBack }: Props) {
             <div>
               <p className="asset-section-kicker">THE COLLECTION <span> / 厳選素材</span></p>
               <h2 id="asset-results-heading">素材を選ぶ<span className="asset-heading-period">.</span></h2>
-              <p>実在する素材パック・アイコンの個別ページを登録。検索はこの厳選カタログ内で行います。</p>
+              <p>厳選した実在素材を比較。Kenneyの一部は原本PNGの実例、その他は装飾イラストです。</p>
             </div>
-            <div className="asset-section-count"><strong>{matches.length.toString().padStart(2, '0')}</strong><span>PACKS FOUND</span></div>
+            <div className="asset-section-count"><strong>{matches.length.toString().padStart(2, '0')}</strong><span>ASSETS FOUND</span></div>
           </div>
 
           <div className="asset-search-bar">
@@ -173,7 +194,7 @@ export default function AssetStudio({ onBack }: Props) {
                 {KIND_LABELS[category]} <span>{category === 'all' ? CURATED_ASSETS.length : CURATED_ASSETS.filter((asset) => asset.kind === category).length}</span>
               </button>
             ))}
-            <span className="asset-filter-hint">実素材の画像があるもののみ実物表示。それ以外は装飾イラストです</span>
+            <span className="asset-filter-hint">原本PNG/SVGのある候補のみ実物を表示。それ以外は装飾です</span>
           </div>
 
           <div className="asset-style-compass">
@@ -207,15 +228,22 @@ export default function AssetStudio({ onBack }: Props) {
                 const saved = shortlist.includes(asset.id);
                 const verdict = licenseVerdict(asset.rights);
                 const styleMatch = assessStyleMatch(asset, styleIntent);
+                const gallery = getPreviewGallery(asset.id);
                 return (
                   <article className={selectedId === asset.id ? 'asset-card asset-card-selected' : 'asset-card'} key={asset.id}>
                     <div className={'asset-card-visual asset-tone-' + asset.tone} aria-label="装飾イラスト。実際の素材画像ではありません">
                       <span className="asset-card-visual-count">A/{String(index + 1).padStart(2, '0')}</span>
 
-                      {asset.previewUrl ? (
+                      {gallery ? (
+                        <div className="asset-sprite-gallery" aria-label={asset.title + ' に収録された実スプライトの例'}>
+                          {gallery.samples.map((sample) => (
+                            <img className="asset-sprite-sample" key={sample.blobSha} src={sample.src} loading="eager" alt={sample.label + '（Kenney CC0の原本PNG）'} />
+                          ))}
+                        </div>
+                      ) : asset.previewUrl ? (
                         <img className="asset-real-preview" src={asset.previewUrl} loading="eager" alt={asset.title + ' の実素材プレビュー'} referrerPolicy="no-referrer" onError={(event) => { event.currentTarget.hidden = true; }} />
                       ) : <span className="asset-card-symbol" aria-hidden="true">{asset.symbol}</span>}
-                      <span className="asset-preview-provenance">{asset.previewUrl ? 'ACTUAL ICON / CC BY ORIGINAL' : 'CONCEPT ART / NOT ACTUAL ASSET'}</span>
+                      <span className="asset-preview-provenance">{gallery ? 'ORIGINAL KENNEY PNG / ' + gallery.samples.length + ' SAMPLES' : asset.previewUrl ? 'ACTUAL ICON / CC BY ORIGINAL' : 'CONCEPT ART / NOT ACTUAL ASSET'}</span>
                       <span className="asset-card-watermark" aria-hidden="true">{asset.kind.toUpperCase()}</span>
                     </div>
                     <div className="asset-card-body">
@@ -251,6 +279,29 @@ export default function AssetStudio({ onBack }: Props) {
                 {selected.creditText && <div className="asset-credit-note"><strong>必要なクレジット（候補）</strong><p>{selected.creditText}</p></div>}
                 <p className="asset-inspector-heading">STYLE MATCH / RULE EVIDENCE</p>
                 <p className="asset-godot-note">{assessStyleMatch(selected, styleIntent).label}。一致タグ: {assessStyleMatch(selected, styleIntent).evidence.join(' / ') || 'なし'}。{assessStyleMatch(selected, styleIntent).rationale}</p>
+                <div className="asset-visual-lab" aria-label="画像特徴の実測">
+                  <div className="asset-visual-lab-heading"><strong>MAF VISUAL EVIDENCE</strong><span>LOCAL / NOT AI</span></div>
+                  <p>原本PNGの見本だけを画素単位で分析し、MAF-M1.8の参考パレットと色差を比較します。画風の総合評価やAI画像認識ではありません。</p>
+                  <button type="button" className="asset-analyze-button" disabled={!selectedGallery || activeVisual?.status === 'loading'} onClick={() => void inspectOriginalSprites()}>
+                    {activeVisual?.status === 'loading' ? '画像を分析中…' : selectedGallery ? selectedGallery.samples.length + '枚の実画像を分析' : '画像の計測は未対応'}
+                  </button>
+                  {!selectedGallery && <p className="asset-analysis-note">実物サンプルがないため、タグ一致のみが利用できます。</p>}
+                  {activeVisual?.status === 'error' && <p role="alert" className="asset-analysis-error">ローカル画像を計測できませんでした。元素材リンクを確認してください。</p>}
+                  {activeVisual?.status === 'ok' && activeVisual.evidence && (
+                    <div className="asset-analysis-result" role="status">
+                      <div className="asset-analysis-stats">
+                        <span>見本 <b>{activeVisual.evidence.sampleCount}</b> 枚</span>
+                        <span>色分類 <b>{activeVisual.evidence.colorBuckets}</b></span>
+                        <span>透明領域 <b>{Math.round(activeVisual.evidence.transparentRatio * 100)}%</b></span>
+                      </div>
+                      <div className="asset-analysis-swatches" aria-label="見本画像から測った代表色">
+                        {activeVisual.evidence.colors.map(color => <span key={color} title={color} style={{ backgroundColor: color }} />)}
+                      </div>
+                      {comparedPalettes.length > 0 && <p className="asset-palette-nearest">MAFパレットとのRGB色差が最小：<strong>{comparedPalettes[0].label}</strong>（距離 {comparedPalettes[0].meanDistance}、小さいほど近い）</p>}
+                      <small>※見本の代表色5色による簡易計算。色差は印象・品質・著作権の保証ではありません。</small>
+                    </div>
+                  )}
+                </div>
                 <p className="asset-inspector-heading">GODOT IMPORT NOTE</p>
                 <p className="asset-godot-note">{selected.godotHint}</p>
                 <a href={selected.url} target="_blank" rel="noopener noreferrer" className="asset-source-cta">素材ページを開く <span aria-hidden="true">↗</span></a>
@@ -299,7 +350,7 @@ export default function AssetStudio({ onBack }: Props) {
           </div>
         </section>
 
-        <footer className="asset-footer"><span>✳ madowaku / ASSET STUDIO</span><p>DISCOVER WELL. CREDIT RIGHT. MAKE MORE.</p><span>© MGSF M1.5 • LOCAL PILOT</span></footer>
+        <footer className="asset-footer"><span>✳ madowaku / ASSET STUDIO</span><p>DISCOVER WELL. CREDIT RIGHT. MAKE MORE.</p><span>© MGSF M1.5.2 • LOCAL PILOT</span></footer>
       </main>
       <p className="asset-announcer" role="status" aria-live="polite">{feedback}</p>
     </div>
