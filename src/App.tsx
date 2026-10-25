@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBackupText, restoreBackupText } from './backup';
+import AssetStudio from './AssetStudio';
 import {
   buildGoalMakerPrompt,
   buildPlanPrompt,
@@ -98,6 +99,7 @@ function loadProjects() {
 
 export default function App() {
   const [projects, setProjects] = useState<CockpitProject[]>(loadProjects);
+  const [assetStudioOpen, setAssetStudioOpen] = useState(() => new URLSearchParams(window.location.search).get('view') === 'asset-studio');
   const [activeProjectId, setActiveProjectId] = useState(projects[0]?.id ?? starterProjects[0].id);
   const [copied, setCopied] = useState<string | null>(null);
   const [backupStatus, setBackupStatus] = useState('手動バックアップでlocalStorageを守れます。');
@@ -109,6 +111,20 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(projects));
   }, [projects]);
+
+  useEffect(() => {
+    const onPopState = () => setAssetStudioOpen(new URLSearchParams(window.location.search).get('view') === 'asset-studio');
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  function navigateAssetStudio(open: boolean) {
+    const next = new URL(window.location.href);
+    if (open) next.searchParams.set('view', 'asset-studio');
+    else next.searchParams.delete('view');
+    window.history.pushState(null, '', next);
+    setAssetStudioOpen(open);
+  }
 
   const prompts = useMemo(
     () => ({
@@ -283,6 +299,8 @@ export default function App() {
     }
   }
 
+  if (assetStudioOpen) return <AssetStudio onBack={() => navigateAssetStudio(false)} />;
+
   return (
     <main className="cockpit-shell">
       <aside className="project-rail" aria-label="Projects">
@@ -305,6 +323,11 @@ export default function App() {
             </button>
           ))}
         </div>
+
+        <button className="add-project asset-studio-launch" type="button" onClick={() => navigateAssetStudio(true)}>
+          ✳ Asset Studio
+          <small>素材を探す・権利を確認・Godotへ引き継ぐ</small>
+        </button>
 
         <button className="add-project" onClick={addProject} type="button">
           + Project
