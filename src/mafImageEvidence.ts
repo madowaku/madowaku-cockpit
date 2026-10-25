@@ -83,15 +83,15 @@ export async function analyzeLocalPreviews(urls: readonly string[]): Promise<Vis
       img.onerror = () => reject(new Error('Image unavailable'));
     });
     const canvas = document.createElement('canvas');
-    canvas.width = 48; canvas.height = 48;
+    // Preserve source aspect ratio and exclude artificial letterboxing from alpha measurements.
+    const scale = Math.min(1, 48/img.naturalWidth, 48/img.naturalHeight);
+    canvas.width = Math.max(1, Math.round(img.naturalWidth*scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight*scale));
     const ctx = canvas.getContext('2d',{willReadFrequently:true});
     if (!ctx) throw new Error('Canvas unavailable');
-    ctx.clearRect(0,0,48,48);
     ctx.imageSmoothingEnabled = false;
-    const scale = Math.min(canvas.width/img.naturalWidth,canvas.height/img.naturalHeight);
-    const w=Math.max(1,Math.round(img.naturalWidth*scale)),h=Math.max(1,Math.round(img.naturalHeight*scale));
-    ctx.drawImage(img, Math.floor((48-w)/2),Math.floor((48-h)/2),w,h);
-    chunks.push(ctx.getImageData(0,0,48,48).data);
+    ctx.drawImage(img, 0,0,canvas.width,canvas.height);
+    chunks.push(ctx.getImageData(0,0,canvas.width,canvas.height).data);
   }
   const rgba = new Uint8ClampedArray(chunks.reduce((sum,c)=>sum+c.length,0));
   let offset=0;
