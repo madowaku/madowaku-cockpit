@@ -7,7 +7,7 @@ Give a non-expert game maker one calm, visual flow: **discover → check provena
 ## Entry and usage
 
 1. From the Cockpit project rail, select **✳ Asset Studio**.
-2. Search the 8-entry curated pack list by keyword, choose UI/2D/3D/icon filters, optionally filter to evidenced CC0.
+2. Search the curated per-asset list by keyword, choose UI/2D/3D/icon filters, optionally filter to evidenced CC0.
 3. Choose **詳細を見る** to inspect the **individual asset** URL and licensing evidence.
 4. Choose **+ 候補に追加** to build a shortlist. Shortlist IDs are stored under `madowaku-mgsf-asset-studio-shortlist-v1`, separate from legacy Cockpit project backup.
 5. Choose **導入メモをコピー** or **Markdownに保存**, then manually obtain source files and test in Godot.
@@ -19,9 +19,9 @@ The current previews are intentionally **decorative CSS, not screenshots of down
 ## Trust and licensing contract
 
 - **Source policy != per-item approval.** A source portal does not constitute approval for all its contents.
-- `CURATED_ASSETS` contains only hand-checked Kenney pack URLs advertising **CC0**. Each pack has an evidence URL pointing to its actual listing; recheck the downloaded LICENSE and current listing prior to production use.
+- `CURATED_ASSETS` contains hand-checked Kenney pack URLs advertising **CC0**, plus two specific Game-icons.net pages under **CC BY 3.0** with author and ready-to-review credit text. Each entry has an evidence URL pointing to its actual listing; recheck the downloaded LICENSE and current listing prior to production use.
 - Kenney states its assets on asset pages are CC0, including commercial uses: https://kenney.nl/support
-- Game-icons.net describes CC BY 3.0 and an author credit obligation: https://game-icons.net/about.html
+- Game-icons.net describes CC BY 3.0 and an author credit obligation: https://game-icons.net/about.html. Curated examples: [Crossed swords by Lorc](https://game-icons.net/1x1/lorc/crossed-swords.html) and [Two handed sword by Delapouite](https://game-icons.net/1x1/delapouite/two-handed-sword.html). The exported Markdown includes credited author and sample credit text.
 - Freesound has multiple CC licenses, including non-commercial cases: https://freesound.org/help/faq/
 - Mixamo allows royalty-free characters/animation in commercial games; redistribution of raw assets is a separate concern. https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html
 - The **Godot Asset Store** supersedes the deprecated Asset Library (which stays for older releases); verify individual add-on terms: https://godotengine.org/article/introducing-the-godot-asset-store/ and https://store.godotengine.org/
@@ -65,6 +65,8 @@ Manual (human review remains required):
 - [ ] Verify **Japanese characters actually render** in CI screenshots (CI installs Noto CJK fonts) and check type hierarchy.
 - [ ] Keyboard-only Tab / Shift+Tab: skip link, category filters, source links, add/remove buttons and export.
 - [ ] Search `RPG`, `3D`, an unmatched term, reset, filter by kind and CC0.
+- [ ] Compare CC0-only on/off; the two CC BY icons must disappear when CC0-only is enabled.
+- [ ] Choose a CC BY icon; its detail must display an amber '要クレジット' indicator and precise author/credit text.
 - [ ] Add two packs, remove one, reload; check shortlist persistence without touching Cockpit backup.
 - [ ] Copy the AI research prompt; verify all 8 sources, current category/query, license verification and no auto-download instructions.
 - [ ] Copy and save markdown, verify URLs / evidence / unchecked quality gates.
