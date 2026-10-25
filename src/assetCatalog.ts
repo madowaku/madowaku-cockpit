@@ -37,7 +37,7 @@ export const ASSET_SOURCES: readonly AssetSource[] = [
   { id: 'freesound', name: 'Freesound', domain: 'freesound.org', url: 'https://freesound.org/', specialty: 'SFX / Ambience', licenseNote: 'CC0 / CC BY / CC BY-NCなど。商用不可素材を除外する。', status: 'item-review', symbol: '♫' },
   { id: 'game-icons', name: 'Game-icons.net', domain: 'game-icons.net', url: 'https://game-icons.net/', specialty: 'Game UI / Icons', licenseNote: '主にCC BY 3.0。採用するアイコンごとに作者を記録してクレジット。', status: 'item-review', symbol: '✧' },
   { id: 'opengameart', name: 'OpenGameArt', domain: 'opengameart.org', url: 'https://opengameart.org/', specialty: 'Sprites / Music', licenseNote: 'CC0 / CC BY / GPL等が混在。ファイル単位の条件を確認。', status: 'item-review', symbol: '▣' },
-  { id: 'godot', name: 'Godot Asset Library', domain: 'godotengine.org', url: 'https://godotengine.org/asset-library/asset', specialty: 'Godot / Add-ons', licenseNote: 'Godot本体のMITライセンスと各アドオンのライセンスは別。', status: 'item-review', symbol: '⬡' }
+  { id: 'godot', name: 'Godot Asset Store', domain: 'store.godotengine.org', url: 'https://store.godotengine.org/', specialty: 'Godot / Add-ons', licenseNote: '新Asset Storeを優先。旧Asset Libraryは非推奨。各アドオンの利用条件は個別確認。', status: 'item-review', symbol: '⬡' }
 ];
 
 /** Hand-picked real pack pages, not live search results or locally hosted asset files. */
