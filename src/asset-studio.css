@@ -150,6 +150,15 @@
 .asset-filter:hover:not(.active) { border-color: #75918c; background: #eaf5ec; }
 .asset-filter span { margin-left: 6px; opacity: .6; font-size: 10px; }
 .asset-filter-hint { margin-left: auto; color: #95a19d; font-size: 10px; }
+
+.asset-research-guide { display: flex; justify-content: space-between; align-items: center; gap: 19px; margin: 0 0 22px; padding: 19px 22px; border: 1px solid #c5ddce; border-radius: 12px; background: linear-gradient(110deg,#e0f1e3,#f4f6e9); }
+.asset-research-guide > div { min-width: 0; }
+.asset-research-guide > div > span { display: block; margin-bottom: 4px; color: #548271; font: 900 10px/1.4 "Segoe UI",sans-serif; letter-spacing: .14em; }
+.asset-research-guide strong { display: block; margin-bottom: 4px; color: #1a4e46; font-size: 16px; letter-spacing: -.04em; }
+.asset-research-guide p { max-width: 760px; margin: 0; color: #57736a; font-size: 11px; line-height: 1.6; }
+.asset-research-guide button { flex: 0 0 auto; display: flex; align-items: center; gap: 21px; border: 1px solid #264d43; border-radius: 8px; background: #1b4843; color: #fff; padding: 12px 15px; font-weight: 850; font-size: 12px !important; }
+.asset-research-guide button:hover { background: #286d5d; }
+.asset-research-guide button span { font-size: 17px; }
 .asset-main-grid { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; align-items: start; }
 .asset-results-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; min-width: 0; }
 .asset-card {
@@ -324,6 +333,8 @@
   .asset-filters { gap: 6px; }
   .asset-filter { padding: 8px 11px; }
   .asset-filter-hint { line-height: 1.5; }
+  .asset-research-guide { flex-direction: column; align-items: stretch; padding: 16px; }
+  .asset-research-guide button { justify-content: space-between; }
   .asset-results-grid { grid-template-columns: 1fr; }
   .asset-card { display: grid; grid-template-columns: 120px minmax(0,1fr); }
   .asset-card-visual { height: 100%; min-height: 230px; }
