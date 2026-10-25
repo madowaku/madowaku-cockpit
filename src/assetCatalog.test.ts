@@ -9,13 +9,23 @@ describe('MGSF Asset Studio catalog', () => {
     expect(ASSET_SOURCES.find((source) => source.id === 'godot')?.url).toBe('https://store.godotengine.org/');
   });
 
-  it('keeps provenance for every curated pack and avoids invented local files', () => {
-    expect(CURATED_ASSETS.length).toBeGreaterThan(5);
+  it('keeps individual-page provenance, distinguishes CC0 and attributed CC BY', () => {
+    expect(CURATED_ASSETS.length).toBeGreaterThan(8);
     for (const item of CURATED_ASSETS) {
-      expect(item.url).toMatch(/^https:\/\/kenney\.nl\/assets\//);
+      expect(item.url).toMatch(/^https:\/\//);
       expect(item.evidenceUrl).toBe(item.url);
-      expect(item.rights).toBe('verified-cc0');
-      expect(item.license).toBe('CC0');
+      if (item.source === 'Kenney') {
+        expect(item.url).toMatch(/^https:\/\/kenney\.nl\/assets\//);
+        expect(item.rights).toBe('verified-cc0');
+        expect(item.license).toBe('CC0');
+      } else {
+        expect(item.source).toBe('Game-icons.net');
+        expect(item.rights).toBe('attribution-required');
+        expect(item.license).toBe('CC BY 3.0');
+        expect(item.author).toBeTruthy();
+        expect(item.creditText).toContain(item.author);
+        expect(item.creditText).toContain(item.url);
+      }
     }
   });
 
@@ -23,6 +33,8 @@ describe('MGSF Asset Studio catalog', () => {
     const originalCount = CURATED_ASSETS.length;
     expect(filterAssets(CURATED_ASSETS, ' RACING ', '3d').map((asset) => asset.id)).toEqual(['kenney-racing']);
     expect(filterAssets(CURATED_ASSETS, '', 'ui').length).toBe(2);
+    expect(filterAssets(CURATED_ASSETS, '', 'icons').length).toBe(3);
+    expect(filterAssets(CURATED_ASSETS, '', 'all', true).length).toBe(8);
     expect(filterAssets(CURATED_ASSETS, 'unmatched', 'all')).toEqual([]);
     expect(CURATED_ASSETS).toHaveLength(originalCount);
   });
@@ -58,5 +70,13 @@ describe('MGSF Asset Studio catalog', () => {
     expect(note).toContain('原本のLICENSE/配布条件を保存');
     expect(note).not.toContain('導入済み');
     expect(createGodotHandoff([])).toContain('候補はまだありません。');
+    const attributed = CURATED_ASSETS.find((asset) => asset.id === 'game-icons-crossed-swords');
+    if (!attributed) throw new Error('Curated crossed-swords record missing');
+    const creditNote = createGodotHandoff([attributed]);
+    expect(creditNote).toContain('Lorc');
+    expect(creditNote).toContain('CC BY 3.0');
+    expect(creditNote).toContain(attributed.url);
+    expect(creditNote).toContain('必要クレジット:');
+
   });
 });
