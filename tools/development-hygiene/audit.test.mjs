@@ -61,7 +61,7 @@ test('untracked, ignored and unmerged content are retained', async () => fixture
   git(linked, 'add', 'scratch.txt');
   git(linked, 'commit', '-qm', 'unmerged');
   const report = await auditDevelopmentWorktrees({ cwd: repo });
-  const item = report.worktrees.find((x) => x.path === linked);
+  const item = report.worktrees.find((x) => path.normalize(x.path).toLowerCase() === path.normalize(linked).toLowerCase());
   assert.equal(item.classification, 'MUST_KEEP');
   assert.equal(item.unmerged, true);
   assert.equal(item.ignored, true);
@@ -72,7 +72,7 @@ test('untracked, ignored and unmerged content are retained', async () => fixture
 test('untracked files are recognized as dirty', async () => fixture(async ({ repo, linked }) => {
   await fs.writeFile(path.join(linked, 'do-not-delete.txt'), 'draft');
   const report = await auditDevelopmentWorktrees({ cwd: repo });
-  const item = report.worktrees.find((x) => x.path === linked);
+  const item = report.worktrees.find((x) => path.normalize(x.path).toLowerCase() === path.normalize(linked).toLowerCase());
   assert.equal(item.dirty, true);
   assert.equal(item.classification, 'MUST_KEEP');
 }));
@@ -80,7 +80,7 @@ test('untracked files are recognized as dirty', async () => fixture(async ({ rep
 test('external filter configuration fails closed', async () => fixture(async ({ repo, linked }) => {
   git(linked, 'config', 'filter.demo.process', 'dangerous-helper');
   const report = await auditDevelopmentWorktrees({ cwd: repo });
-  assert.equal(report.worktrees.find((x) => x.path === linked).classification, 'UNKNOWN_KEEP');
+  assert.equal(report.worktrees.find((x) => path.normalize(x.path).toLowerCase() === path.normalize(linked).toLowerCase()).classification, 'UNKNOWN_KEEP');
 }));
 
 test('Git redirect environment is rejected before inspection', async () => fixture(async ({ repo }) => {
