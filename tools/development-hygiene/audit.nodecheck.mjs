@@ -48,7 +48,7 @@ test('read-only audit leaves repo and linked worktree untouched', async () => fi
   assert.equal(report.mode, 'READ_ONLY');
   assert.equal(report.worktrees.length, 2);
   assert.equal(report.worktrees[0].classification, 'MUST_KEEP');
-  assert.equal(report.worktrees[1].classification, 'REVIEW_REQUIRED', JSON.stringify(report.worktrees[1]));
+  assert.equal(report.worktrees[1].classification, 'REVIEW_REQUIRED', JSON.stringify({ worktree: report.worktrees[1], rawStatus: git(linked, 'status', '--porcelain=v1'), linked }));
   assert.equal(git(repo, 'status', '--porcelain=v1'), before);
   assert.match(git(repo, 'worktree', 'list'), /linked/);
   assert.equal(await fs.readFile(path.join(linked, 'source.txt'), 'utf8'), 'first\n');
@@ -61,7 +61,7 @@ test('untracked, ignored and unmerged content are retained', async () => fixture
   git(linked, 'add', 'scratch.txt');
   git(linked, 'commit', '-qm', 'unmerged');
   const report = await auditDevelopmentWorktrees({ cwd: repo });
-  const item = report.worktrees.find((x) => path.normalize(x.path).toLowerCase() === path.normalize(linked).toLowerCase());
+  const item = report.worktrees[1];
   assert.equal(item.classification, 'MUST_KEEP');
   assert.equal(item.unmerged, true);
   assert.equal(item.ignored, true);
@@ -72,7 +72,7 @@ test('untracked, ignored and unmerged content are retained', async () => fixture
 test('untracked files are recognized as dirty', async () => fixture(async ({ repo, linked }) => {
   await fs.writeFile(path.join(linked, 'do-not-delete.txt'), 'draft');
   const report = await auditDevelopmentWorktrees({ cwd: repo });
-  const item = report.worktrees.find((x) => path.normalize(x.path).toLowerCase() === path.normalize(linked).toLowerCase());
+  const item = report.worktrees[1];
   assert.equal(item.dirty, true);
   assert.equal(item.classification, 'MUST_KEEP');
 }));
@@ -80,7 +80,7 @@ test('untracked files are recognized as dirty', async () => fixture(async ({ rep
 test('external filter configuration fails closed', async () => fixture(async ({ repo, linked }) => {
   git(linked, 'config', 'filter.demo.process', 'dangerous-helper');
   const report = await auditDevelopmentWorktrees({ cwd: repo });
-  assert.equal(report.worktrees.find((x) => path.normalize(x.path).toLowerCase() === path.normalize(linked).toLowerCase()).classification, 'UNKNOWN_KEEP');
+  assert.equal(report.worktrees[1].classification, 'UNKNOWN_KEEP');
 }));
 
 test('Git redirect environment is rejected before inspection', async () => fixture(async ({ repo }) => {
