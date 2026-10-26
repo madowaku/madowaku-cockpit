@@ -12,6 +12,7 @@ v1.0 baseline: [docs/mcp-v1-baseline.md](docs/mcp-v1-baseline.md).
 Icon source policy: [ICON_SOURCES.md](ICON_SOURCES.md).
 Legacy icon selection rule: [docs/icon-librarian.md](docs/icon-librarian.md).
 Reusable UI Librarian skill catalog: [skills/README.md](skills/README.md).
+Nova-inspired reference-only design lab: [docs/MCC_UI_M1_NOVA_BRIDGE.md](docs/MCC_UI_M1_NOVA_BRIDGE.md). The collapsed Nova Bridge Lab inside Cockpit previews scoped semantic tokens and provides review-first Codex instructions without vendor dependencies.
 Change history: [CHANGELOG.md](CHANGELOG.md).
 
 ## Reusable Codex Skill Family: UI Librarians
