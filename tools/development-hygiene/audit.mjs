@@ -13,7 +13,7 @@ const GIT_ENV_REDIRECT = /^(GIT_DIR|GIT_WORK_TREE|GIT_INDEX_FILE|GIT_COMMON_DIR|
 function cleanEnv(env) {
   const redirect = Object.keys(env).filter((key) => GIT_ENV_REDIRECT.test(key));
   if (redirect.length) throw new Error(`Git environment overrides detected (${redirect.join(', ')}). Audit refused.`);
-  return { ...env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0', GIT_CONFIG_NOSYSTEM: '1' };
+  return { ...env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0' };
 }
 
 async function git(cwd, args, env, allowExitOne = false) {
