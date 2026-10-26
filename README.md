@@ -2,6 +2,16 @@
 
 Local-first cockpit for copy-only AI handoffs, review notes, and AI Creole packets.
 
+## MCC-M4 Development Hygiene Guard (experimental)
+
+A **separate read-only CLI and opt-in Cockpit report viewer** help triage Git worktrees without deleting or modifying any project files. The original MCP bridge still has no shell or write capabilities.
+
+```sh
+npm run hygiene:audit -- --repo /path/to/trusted/repo
+```
+
+The CLI prints JSON to the terminal; paste it manually into the collapsed MCC-M4 viewer in Cockpit. Reports are not stored in localStorage or uploaded by the viewer. `REVIEW_REQUIRED` is never deletion permission; another session, model artifacts, external launchers and references still need human confirmation. See [the safety and operating guide](docs/development-hygiene-guard.md) and [Codex / Claude handoff Skill](skills/development-hygiene-guard/SKILL.md).
+
 ## Read-Only MCP Local Bridge
 
 This repo includes a minimal read-only MCP-style stdio bridge for letting ChatGPT inspect local context without granting shell or write access.

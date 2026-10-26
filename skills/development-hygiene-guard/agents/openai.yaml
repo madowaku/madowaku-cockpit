@@ -1,0 +1,4 @@
+interface:
+  display_name: "Development Hygiene Guard"
+  short_description: "Read-only Git worktree audit with strict keep/unknown gates"
+  default_prompt: "Review this project's worktrees without deleting anything. Classify basic Git risks and explain which external checks remain unknown."

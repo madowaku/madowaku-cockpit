@@ -37,3 +37,18 @@ jobs:
 
       - name: Smoke read-only MCP bridge
         run: npm run mcp:smoke
+
+  hygiene-windows:
+    name: Hygiene audit fixture tests (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate read-only audit on Windows Git
+        run: node --test tools/development-hygiene/audit.nodecheck.mjs

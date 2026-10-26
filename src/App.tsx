@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBackupText, restoreBackupText } from './backup';
+import DevelopmentHygieneLab from './DevelopmentHygieneLab';
 import {
   buildGoalMakerPrompt,
   buildPlanPrompt,
@@ -403,6 +404,7 @@ export default function App() {
           </div>
           <small>{activeFocus.safetyNote}</small>
         </section>
+        <DevelopmentHygieneLab />
         <section className={focusClass('AI Workbench', 'workbench')} aria-label="AI Workbench Dashboard">
           <div className="workbench-heading">
             <div>
