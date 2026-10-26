@@ -47,7 +47,7 @@ Checks include `git worktree list --porcelain -z`, a bounded Git status, ignored
 ## Local verification
 
 ```sh
-node --test tools/development-hygiene/audit.test.mjs
+node --test tools/development-hygiene/audit.nodecheck.mjs
 npm test
 npm run build
 npm run mcp:smoke
