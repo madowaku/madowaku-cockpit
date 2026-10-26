@@ -60,3 +60,6 @@ Use $motion-librarian to add expand/collapse feedback while preserving the proje
 Add a new librarian only when a recurring class of UI decisions has enough distinct discovery, integration, accessibility, dependency, or verification rules to justify its own context. Do not split skills merely to create a larger taxonomy.
 
 Likely future candidates include illustration assets, color/theme systems, data visualization, sound feedback, and 3D/web-graphics assets.
+## Independent operations Skill (not a UI librarian)
+
+`development-hygiene-guard` is an **audit-only** helper for Codex/Claude Code. It reports Git worktree risks using the standalone Node scanner. It must never remove worktrees or change the read-only MCP bridge. See [Skill](development-hygiene-guard/SKILL.md) and [safety policy](../docs/development-hygiene-guard.md).
