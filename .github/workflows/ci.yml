@@ -51,4 +51,4 @@ jobs:
           node-version: 22
 
       - name: Validate read-only audit on Windows Git
-        run: node --test tools/development-hygiene/audit.test.mjs
+        run: node --test tools/development-hygiene/audit.nodecheck.mjs
