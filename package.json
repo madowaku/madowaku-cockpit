@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "vitest run && node --test tools/development-hygiene/audit.test.mjs",
+    "test": "vitest run && node --test tools/development-hygiene/audit.nodecheck.mjs",
     "mcp:local": "node mcp/server.mjs",
     "mcp:smoke": "node mcp/server.mjs smoke sample",
     "hygiene:audit": "node tools/development-hygiene/audit.mjs"
