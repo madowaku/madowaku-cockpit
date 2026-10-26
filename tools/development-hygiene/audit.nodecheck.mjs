@@ -10,6 +10,16 @@ function git(cwd, ...args) {
   return execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
+function isolatedGitEnv(repo) {
+  // CI runners may globally enable Git LFS filters and Windows autocrlf.
+  // Only synthetic fixtures use this isolated environment, never the user's repo.
+  return {
+    ...process.env,
+    GIT_CONFIG_NOSYSTEM: '1',
+    GIT_CONFIG_GLOBAL: path.join(path.dirname(repo), 'nonexistent-fixture-global-gitconfig')
+  };
+}
+
 async function fixture(fn) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'mcc-hygiene-'));
   const repo = path.join(root, 'repo');
@@ -17,6 +27,7 @@ async function fixture(fn) {
   try {
     await fs.mkdir(repo);
     git(repo, 'init', '-q');
+    git(repo, 'config', 'core.autocrlf', 'false');
     git(repo, 'config', 'user.name', 'MCC Test');
     git(repo, 'config', 'user.email', 'mcc@example.invalid');
     await fs.writeFile(path.join(repo, 'source.txt'), 'first\n');
@@ -44,7 +55,7 @@ test('classification never marks a worktree as deletable', () => {
 
 test('read-only audit leaves repo and linked worktree untouched', async () => fixture(async ({ repo, linked }) => {
   const before = git(repo, 'status', '--porcelain=v1');
-  const report = await auditDevelopmentWorktrees({ cwd: repo });
+  const report = await auditDevelopmentWorktrees({ cwd: repo, env: isolatedGitEnv(repo) });
   assert.equal(report.mode, 'READ_ONLY');
   assert.equal(report.worktrees.length, 2);
   assert.equal(report.worktrees[0].classification, 'MUST_KEEP');
@@ -60,7 +71,7 @@ test('untracked, ignored and unmerged content are retained', async () => fixture
   await fs.writeFile(path.join(linked, 'cache', 'model.bin'), 'unique');
   git(linked, 'add', 'scratch.txt');
   git(linked, 'commit', '-qm', 'unmerged');
-  const report = await auditDevelopmentWorktrees({ cwd: repo });
+  const report = await auditDevelopmentWorktrees({ cwd: repo, env: isolatedGitEnv(repo) });
   const item = report.worktrees[1];
   assert.equal(item.classification, 'MUST_KEEP');
   assert.equal(item.unmerged, true);
@@ -71,7 +82,7 @@ test('untracked, ignored and unmerged content are retained', async () => fixture
 
 test('untracked files are recognized as dirty', async () => fixture(async ({ repo, linked }) => {
   await fs.writeFile(path.join(linked, 'do-not-delete.txt'), 'draft');
-  const report = await auditDevelopmentWorktrees({ cwd: repo });
+  const report = await auditDevelopmentWorktrees({ cwd: repo, env: isolatedGitEnv(repo) });
   const item = report.worktrees[1];
   assert.equal(item.dirty, true);
   assert.equal(item.classification, 'MUST_KEEP');
@@ -79,10 +90,10 @@ test('untracked files are recognized as dirty', async () => fixture(async ({ rep
 
 test('external filter configuration fails closed', async () => fixture(async ({ repo, linked }) => {
   git(linked, 'config', 'filter.demo.process', 'dangerous-helper');
-  const report = await auditDevelopmentWorktrees({ cwd: repo });
+  const report = await auditDevelopmentWorktrees({ cwd: repo, env: isolatedGitEnv(repo) });
   assert.equal(report.worktrees[1].classification, 'UNKNOWN_KEEP');
 }));
 
 test('Git redirect environment is rejected before inspection', async () => fixture(async ({ repo }) => {
-  await assert.rejects(auditDevelopmentWorktrees({ cwd: repo, env: { ...process.env, GIT_DIR: '/tmp/forged' } }), /environment overrides/);
+  await assert.rejects(auditDevelopmentWorktrees({ cwd: repo, env: { ...isolatedGitEnv(repo), GIT_DIR: '/tmp/forged' } }), /environment overrides/);
 }));
