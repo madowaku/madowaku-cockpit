@@ -35,6 +35,8 @@ Use the narrowest relevant specialist:
 
 Read [routing.md](references/routing.md) when the task spans several categories or the boundary is unclear.
 
+For Sun* Nova-inspired semantic tokens, public package access limitations, and isolated cockpit demonstrations, consult [nova-bridge.md](references/nova-bridge.md). This is a reference-first adapter, not a licensed vendor package installation.
+
 ## Orchestration loop
 
 1. **Name the user-facing job.** Describe what the interface must communicate or enable before naming a library or asset.

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import NovaDesignLab from './NovaDesignLab';
 import { createBackupText, restoreBackupText } from './backup';
 import {
   buildGoalMakerPrompt,
@@ -403,6 +404,7 @@ export default function App() {
           </div>
           <small>{activeFocus.safetyNote}</small>
         </section>
+        <NovaDesignLab projectName={activeProject.name} taskTitle={activeProject.task.title} onCopy={copyPrompt} />
         <section className={focusClass('AI Workbench', 'workbench')} aria-label="AI Workbench Dashboard">
           <div className="workbench-heading">
             <div>
