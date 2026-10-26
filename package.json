@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test": "vitest run",
+    "test": "vitest run && node --test tools/development-hygiene/audit.test.mjs",
     "mcp:local": "node mcp/server.mjs",
-    "mcp:smoke": "node mcp/server.mjs smoke sample"
+    "mcp:smoke": "node mcp/server.mjs smoke sample",
+    "hygiene:audit": "node tools/development-hygiene/audit.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",
