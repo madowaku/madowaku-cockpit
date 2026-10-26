@@ -12,7 +12,7 @@ const GIT_ENV_REDIRECT = /^(GIT_DIR|GIT_WORK_TREE|GIT_INDEX_FILE|GIT_COMMON_DIR|
 
 function cleanEnv(env) {
   const redirect = Object.keys(env).filter((key) => GIT_ENV_REDIRECT.test(key));
-  if (redirect.length) throw new Error(\`Git environment overrides detected (\${redirect.join(', ')}). Audit refused.\`);
+  if (redirect.length) throw new Error(`Git environment overrides detected (${redirect.join(', ')}). Audit refused.`);
   return { ...env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0', GIT_CONFIG_NOSYSTEM: '1' };
 }
 
@@ -24,7 +24,7 @@ async function git(cwd, args, env, allowExitOne = false) {
     return stdout;
   } catch (error) {
     if (allowExitOne && error.code === 1) return '';
-    throw new Error(\`Git inspection unavailable: \${String(error.message).slice(0, 240)}\`);
+    throw new Error(`Git inspection unavailable: ${String(error.message).slice(0, 240)}`);
   }
 }
 
@@ -56,7 +56,7 @@ export function parseWorktrees(porcelain) {
 
 function isInside(candidate, root) {
   const relative = path.relative(root, candidate);
-  return relative === '' || (relative !== '..' && !relative.startsWith(\`..\${path.sep}\`) && !path.isAbsolute(relative));
+  return relative === '' || (relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative));
 }
 
 export function classifyWorktree({ isActive, isPrimary, dirty, ignored, locked, prunable, unmerged, inspectionError }) {
@@ -155,7 +155,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (args.help) console.log('Read-only Git worktree audit: node tools/development-hygiene/audit.mjs [--repo PATH]');
     else console.log(JSON.stringify(await auditDevelopmentWorktrees(args), null, 2));
   } catch (error) {
-    console.error(\`MCC-M4 audit refused: \${error.message}\`);
+    console.error(`MCC-M4 audit refused: ${error.message}`);
     process.exitCode = 2;
   }
 }
