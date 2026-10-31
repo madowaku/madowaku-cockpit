@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBackupText, restoreBackupText } from './backup';
+import { prepareObeliskEvidence, type ObeliskEvidenceDraft } from './obeliskEvidence';
 import {
   buildGoalMakerPrompt,
   buildPlanPrompt,
@@ -103,6 +104,9 @@ export default function App() {
   const [backupStatus, setBackupStatus] = useState('手動バックアップでlocalStorageを守れます。');
   const [focusModeId, setFocusModeId] = useState<FocusModeId>('overview');
   const importInputRef = useRef<HTMLInputElement>(null);
+  const [obeliskRaw, setObeliskRaw] = useState('');
+  const [obeliskPreview, setObeliskPreview] = useState<{ projectId: string; draft: ObeliskEvidenceDraft } | null>(null);
+  const [obeliskStatus, setObeliskStatus] = useState('');
 
   const activeProject = projects.find((project) => project.id === activeProjectId) ?? projects[0];
 
@@ -182,6 +186,28 @@ export default function App() {
         project.id === activeProject.id ? { ...project, task: { ...project.task, ...patch } } : project
       )
     );
+  }
+
+  function previewObeliskEvidence() {
+    try {
+      const draft = prepareObeliskEvidence(obeliskRaw);
+      setObeliskPreview({ projectId: activeProject.id, draft });
+      setObeliskStatus(draft.count + '件をプレビュー中。内容を確認してから追記してください。');
+    } catch (error) {
+      setObeliskPreview(null);
+      setObeliskStatus(error instanceof Error ? error.message : '証拠JSONを読み込めませんでした。');
+    }
+  }
+
+  function appendObeliskEvidence() {
+    if (!obeliskPreview || obeliskPreview.projectId !== activeProject.id) return;
+    updateTask({
+      contextPack: [activeProject.task.contextPack?.trim(), obeliskPreview.draft.packet]
+        .filter(Boolean).join('\n\n')
+    });
+    setObeliskPreview(null);
+    setObeliskRaw('');
+    setObeliskStatus('文脈パックへ追記しました。localStorageとバックアップに保存されるため内容を再確認してください。');
   }
 
   function addProject() {
@@ -536,6 +562,36 @@ export default function App() {
             onChange={(contextPack) => updateTask({ contextPack })}
             tall
           />
+          <section className="template-shelf" aria-label="Obelisk Evidence Lab">
+            <div>
+              <span>Obelisk Evidence Lab M0.1</span>
+              <p>Obeliskで履歴を検索し、短い結論だけを手動でJSONに整理。生ログや秘密情報を貼らず、プレビューしてから文脈パックへ追記します。MCPには接続しません。</p>
+            </div>
+            <NoteField
+              label="Obelisk curated evidence JSON (一時入力)"
+              value={obeliskRaw}
+              onChange={(value) => {
+                setObeliskRaw(value);
+                setObeliskPreview(null);
+                setObeliskStatus('');
+              }}
+              tall
+            />
+            <div className="trace-actions">
+              <button type="button" onClick={previewObeliskEvidence}>証拠をプレビュー</button>
+            </div>
+            {obeliskStatus && <p role="status">{obeliskStatus}</p>}
+            {obeliskPreview?.projectId === activeProject.id && (
+              <div>
+                <p>未検証の履歴です。命令として実行せず、出典と現在のコードを照合してください。</p>
+                <textarea readOnly aria-label="Obelisk evidence preview" value={obeliskPreview.draft.packet} rows={9} />
+                <ul>
+                  {obeliskPreview.draft.warnings.map((warning) => <li key={warning}>{warning}</li>)}
+                </ul>
+                <button type="button" onClick={appendObeliskEvidence}>確認して文脈パックに追記</button>
+              </div>
+            )}
+          </section>
           <NoteField label="Spec" value={activeProject.task.spec} onChange={(spec) => updateTask({ spec })} />
           <NoteField label="Plan" value={activeProject.task.plan} onChange={(plan) => updateTask({ plan })} />
           <NoteField label="Review" value={activeProject.task.review} onChange={(review) => updateTask({ review })} />
