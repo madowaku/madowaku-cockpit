@@ -1,6 +1,6 @@
 /** Offline review-first Obelisk -> AI Creole adapter. No I/O or network calls. */
 export const OBELISK_EVIDENCE_SCHEMA = 'madowaku.obelisk-evidence.v1';
-const SOURCES = new Set(['codex', 'claude', 'claude-code', 'opencode', 'kimi', 'kimi-code', 'copilot', 'pi', 'other']);
+const SOURCES = new Set(['codex', 'claude', 'claude-code', 'opencode', 'kimi', 'kimi-code', 'copilot', 'github-copilot', 'pi', 'deepseek', 'hermes', 'kiro', 'omp', 'zcode', 'other']);
 export type ObeliskEvidenceDraft = { packet: string; count: number; warnings: string[] };
 
 function clean(value: unknown, max: number): string {
@@ -38,7 +38,7 @@ export function prepareObeliskEvidence(input: string): ObeliskEvidenceDraft {
     const summary = clean(row.summary, 320);
     const project = clean(row.project, 64);
     const when = clean(row.when, 10);
-    if (!SOURCES.has(source) || !/^[a-z\d_-]{4,96}$/i.test(id) || !summary || (when && !/^\d{4}-\d\d-\d\d$/.test(when))) {
+    if (!SOURCES.has(source) || !/^[a-z\d_.:-]{4,96}$/i.test(id) || !summary || (when && !/^\d{4}-\d\d-\d\d$/.test(when))) {
       ignored++; continue;
     }
     if (seen.has(source + ':' + id)) { ignored++; continue; }
