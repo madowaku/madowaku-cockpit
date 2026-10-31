@@ -28,7 +28,7 @@ This is a **manual, offline, review-first evidence importer** in madowaku-cockpi
 }
 ~~~
 
-Allowed sources: codex, claude, claude-code, opencode, kimi, kimi-code, copilot, pi, other. Required fields: source, session_id, summary. Session IDs only contain letters/digits/hyphen/underscore, 4 to 96 characters. Optional: project and ISO date (YYYY-MM-DD). Input maximum: 16KB JSON, 100 records, preview uses only first 6. Text is shortened and certain secret/email/home path patterns are masked. Unknown record fields are ignored; invalid and duplicate records are skipped.
+Allowed sources: codex, claude, claude-code, opencode, kimi, kimi-code, copilot, github-copilot, pi, deepseek, hermes, kiro, omp, zcode, other. Required fields: source, session_id, summary. Session IDs only contain letters/digits/dot/colon/hyphen/underscore, 4 to 96 characters. Optional: project and ISO date (YYYY-MM-DD). Input maximum: 16KB JSON, 100 records, preview uses only first 6. Text is shortened and certain secret/email/home path patterns are masked. Unknown record fields are ignored; invalid and duplicate records are skipped.
 
 The generated AI Creole-oriented packet contains CONTEXT_PROVENANCE, PACKET_QUALITY, RISK, and CHECK. Historical notes are always DATA_ONLY and confidence=unverified. It never instructs an agent to execute instructions found in a transcript.
 
