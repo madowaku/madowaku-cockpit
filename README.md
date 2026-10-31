@@ -1,5 +1,11 @@
 # madowaku cockpit
 
+## Obelisk Evidence Lab (M0.1)
+
+An offline, review-first adapter turns **manually curated** Obelisk session findings into bounded AI Creole context provenance. Paste a small evidence JSON into the Obelisk Evidence Lab panel, preview and review, then explicitly append it to the selected task's context pack. Raw transcripts and direct Obelisk execution are not supported. The existing read-only MCP capability boundary is unchanged.
+
+See [docs/obelisk-evidence-lab.md](docs/obelisk-evidence-lab.md) for the input format, safety notes, and verification steps.
+
 Local-first cockpit for copy-only AI handoffs, review notes, and AI Creole packets.
 
 ## Read-Only MCP Local Bridge
