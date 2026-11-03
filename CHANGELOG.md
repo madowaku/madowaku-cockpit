@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added MGSF Agent Parallel Development Lab M0.1: a read-only 2–3 lane plan validator, AI Creole handoffs, measurement helper, sample plan, and Node regression tests.
+- Added a CI test step for the parallel-lane planner without changing the read-only MCP tool set.
+
 - Added GitHub Actions CI for the read-only MCP bridge baseline.
 - Documented the CI guardrail that keeps write, shell, auth, and mutation tools out of scope.
 
