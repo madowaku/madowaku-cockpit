@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "repo": "example/godot-game",
+  "base_branch": "main",
+  "lanes": [
+    {
+      "id": "gameplay",
+      "role": "Game logic agent",
+      "task": "Implement the deterministic turn resolution rule",
+      "branch": "lab/gameplay",
+      "owns": ["game/rules/"]
+    },
+    {
+      "id": "presentation",
+      "role": "UI and feedback agent",
+      "task": "Build the HUD and motion feedback for the new rule",
+      "branch": "lab/presentation",
+      "owns": ["game/ui/"]
+    },
+    {
+      "id": "verification",
+      "role": "Game testing agent",
+      "task": "Add repeatable playtest traces and failure checks",
+      "branch": "lab/verification",
+      "owns": ["tests/"]
+    }
+  ],
+  "merge_gate": {
+    "policy": "manual",
+    "human_review": true,
+    "required_checks": ["unit tests", "headless game smoke", "playtest trace review"]
+  },
+  "baseline": { "elapsed_minutes": 60 }
+}

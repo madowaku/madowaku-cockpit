@@ -35,5 +35,8 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Test parallel development plan (read-only)
+        run: node --test experiments/agent-parallel-lab/plan.node-check.mjs
+
       - name: Smoke read-only MCP bridge
         run: npm run mcp:smoke

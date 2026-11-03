@@ -2,6 +2,10 @@
 
 Local-first cockpit for copy-only AI handoffs, review notes, and AI Creole packets.
 
+## Agent Parallel Development Lab M0.1
+
+[Read-only plan validator, sample lanes, AI Creole handoffs, and tests](experiments/agent-parallel-lab/README.md) for review-first multi-agent game development. This optional experiment does not expand the frozen MCP bridge or execute Git commands.
+
 ## Read-Only MCP Local Bridge
 
 This repo includes a minimal read-only MCP-style stdio bridge for letting ChatGPT inspect local context without granting shell or write access.
