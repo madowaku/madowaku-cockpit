@@ -1,4 +1,4 @@
-import test from "node:test";
+import { test } from "vitest";
 import assert from "node:assert/strict";
 import { auditFeature, toMarkdown, toCreole } from "../scripts/audit.mjs";
 const seed = {feature_id:"door",name:"SF door",player_intent:"Clear traversal",scopes:["door","npc"],deferred_scopes:["coop"]};
