@@ -11,7 +11,7 @@ Security baseline docs: [docs/mcp-security.md](docs/mcp-security.md).
 v1.0 baseline: [docs/mcp-v1-baseline.md](docs/mcp-v1-baseline.md).
 Icon source policy: [ICON_SOURCES.md](ICON_SOURCES.md).
 Legacy icon selection rule: [docs/icon-librarian.md](docs/icon-librarian.md).
-Reusable UI Librarian skill catalog: [skills/README.md](skills/README.md).
+Reusable skill catalog: [skills/README.md](skills/README.md), including MGSF Feature Problem Intelligence M0.1 for gameplay design audits.
 Change history: [CHANGELOG.md](CHANGELOG.md).
 
 ## Reusable Codex Skill Family: UI Librarians
