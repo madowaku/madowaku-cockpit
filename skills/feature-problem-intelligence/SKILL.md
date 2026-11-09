@@ -27,7 +27,7 @@ From the cockpit repository root:
 
     node skills/feature-problem-intelligence/scripts/audit.mjs skills/feature-problem-intelligence/examples/sf-door.json --format=markdown
     node skills/feature-problem-intelligence/scripts/audit.mjs skills/feature-problem-intelligence/examples/sf-door.json --format=creole
-    node --test skills/feature-problem-intelligence/tests/audit.test.mjs
+    npm test
 
 No API calls, new packages, network access or file mutation. The generator prints to stdout.
 
