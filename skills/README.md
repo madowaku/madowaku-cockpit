@@ -60,3 +60,14 @@ Use $motion-librarian to add expand/collapse feedback while preserving the proje
 Add a new librarian only when a recurring class of UI decisions has enough distinct discovery, integration, accessibility, dependency, or verification rules to justify its own context. Do not split skills merely to create a larger taxonomy.
 
 Likely future candidates include illustration assets, color/theme systems, data visualization, sound feedback, and 3D/web-graphics assets.
+## Gameplay systems: Feature Problem Intelligence
+
+`$feature-problem-intelligence` is a **separate**, game-design-oriented Codex skill. It converts a feature's intended player moment into scoped questions, P0/P1/P2 checks, an evidence ledger, and an AI Creole handoff. It does not replace the UI Librarian family or modify the read-only MCP bridge.
+
+```bash
+node skills/feature-problem-intelligence/scripts/audit.mjs skills/feature-problem-intelligence/examples/sf-door.json --format=markdown
+node skills/feature-problem-intelligence/scripts/audit.mjs skills/feature-problem-intelligence/examples/sf-door.json --format=creole
+node --test skills/feature-problem-intelligence/tests/audit.test.mjs
+```
+
+See [`feature-problem-intelligence/SKILL.md`](feature-problem-intelligence/SKILL.md). The first case is an SF automatic door; a world-window example proves the questions can be reused outside door mechanics. Evidence and playtest execution happen in the actual game repository, never in the read-only bridge.
