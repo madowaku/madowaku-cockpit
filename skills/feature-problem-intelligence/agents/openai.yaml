@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature Problem Intelligence"
+  short_description: "Turn gameplay mechanics into prioritized questions and checks"
+  default_prompt: "Use $feature-problem-intelligence to audit this feature, generate a minimal AI Creole handoff, and distinguish assumptions from actual test evidence."
