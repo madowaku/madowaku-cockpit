@@ -67,7 +67,7 @@ Likely future candidates include illustration assets, color/theme systems, data 
 ```bash
 node skills/feature-problem-intelligence/scripts/audit.mjs skills/feature-problem-intelligence/examples/sf-door.json --format=markdown
 node skills/feature-problem-intelligence/scripts/audit.mjs skills/feature-problem-intelligence/examples/sf-door.json --format=creole
-node --test skills/feature-problem-intelligence/tests/audit.test.mjs
+npm test
 ```
 
 See [`feature-problem-intelligence/SKILL.md`](feature-problem-intelligence/SKILL.md). The first case is an SF automatic door; a world-window example proves the questions can be reused outside door mechanics. Evidence and playtest execution happen in the actual game repository, never in the read-only bridge.
