@@ -1,0 +1,15 @@
+{
+  "feature_id": "space-base-auto-door",
+  "name": "Space Base Kit / SF自動ドア",
+  "player_intent": "閉鎖されたSF基地の探索で、進行可能な場所を迷わず見つけ、開く瞬間に少し緊張感を覚える",
+  "engine": "Godot 4 (target, not yet inspected)",
+  "scopes": [
+    "door",
+    "npc"
+  ],
+  "deferred_scopes": [
+    "coop",
+    "streaming"
+  ],
+  "checks": {}
+}

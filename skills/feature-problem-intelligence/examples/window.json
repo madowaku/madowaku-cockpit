@@ -1,0 +1,11 @@
+{
+  "feature_id": "madowaku-world-window",
+  "name": "madowaku / 世界につながる窓",
+  "player_intent": "窓を開く前に行き先を想像し、開いた瞬間に小さな発見を味わう",
+  "engine": "Web UI",
+  "scopes": [
+    "window"
+  ],
+  "deferred_scopes": [],
+  "checks": {}
+}
