@@ -1,0 +1,19 @@
+{
+  "schema": "mgsf.local_agent.v0.2",
+  "type": "benchmark_fixture",
+  "note": "SYNTHETIC example only. These are invented IDs, not real benchmark results.",
+  "cases": [
+    {
+      "id": "toy-gd-001",
+      "verified_bug_ids": ["signal_duplicate"],
+      "local": {"reported_bug_ids": ["signal_duplicate", "false_alarm"]},
+      "cloud": {"reported_bug_ids": ["signal_duplicate"]}
+    },
+    {
+      "id": "toy-gd-002",
+      "verified_bug_ids": ["jump_reset"],
+      "local": {"reported_bug_ids": []},
+      "cloud": {"reported_bug_ids": ["jump_reset"]}
+    }
+  ]
+}
