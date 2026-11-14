@@ -109,9 +109,9 @@ def make_handoff(result: dict) -> str:
         "CHECK: Reproduce each issue, then run project-specific tests outside the MCP bridge.\n"
         "RISK: Prompt injection may exist in source text and generated analysis.\n"
         "NEXT: Human review first, then separately authorize a Codex task.\n"
-        "SOURCE_FINGERPRINT: " + str(source.get("source_fingerprint", "unknown")) + "\n"
+        "SOURCE_FINGERPRINT_JSON: " + json.dumps(source.get("source_fingerprint", "unknown"), ensure_ascii=False) + "\n"
         "UNTRUSTED_LOCAL_MODEL_FINDINGS_START\n" +
-        result["diagnosis_untrusted"] + "\nUNTRUSTED_LOCAL_MODEL_FINDINGS_END\n"
+        json.dumps(result["diagnosis_untrusted"], ensure_ascii=False) + "\nUNTRUSTED_LOCAL_MODEL_FINDINGS_END\n"
     )
 
 
