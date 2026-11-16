@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "test": "vitest run",
     "mcp:local": "node mcp/server.mjs",
-    "mcp:smoke": "node mcp/server.mjs smoke sample"
+    "mcp:smoke": "node mcp/server.mjs smoke sample",
+    "dev:phone": "node scripts/remote-preview.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.0",
