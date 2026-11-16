@@ -2,6 +2,24 @@
 
 Local-first cockpit for copy-only AI handoffs, review notes, and AI Creole packets.
 
+## Private Smartphone Preview (MGSF Remote Preview Bridge M0.1)
+
+Open the local Cockpit on a phone through **Tailscale Serve**, without public deployment. This preview is independent of the read-only MCP bridge.
+
+~~~bash
+npm ci
+npm run dev:phone
+~~~
+
+After reviewing the URL-sharing scope, run this command **in a second terminal**:
+
+~~~bash
+tailscale serve 4173
+~~~
+
+Open the printed private HTTPS URL on a phone connected to the same permitted tailnet. Press Ctrl+C in the Serve terminal when finished. See [docs/remote-preview.md](docs/remote-preview.md) for setup, safety notes, troubleshooting and Codex handoff guidance.
+
+
 ## Read-Only MCP Local Bridge
 
 This repo includes a minimal read-only MCP-style stdio bridge for letting ChatGPT inspect local context without granting shell or write access.
