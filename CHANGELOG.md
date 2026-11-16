@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added MGSF Remote Preview Bridge M0.1: loopback-only Vite launcher, explicit Tailscale Serve setup, safety instructions, and Codex handoff guidance. The read-only MCP tool boundary remains unchanged.
 - Added GitHub Actions CI for the read-only MCP bridge baseline.
 - Documented the CI guardrail that keeps write, shell, auth, and mutation tools out of scope.
 
