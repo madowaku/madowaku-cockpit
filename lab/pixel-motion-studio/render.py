@@ -32,7 +32,7 @@ def ease(value: float) -> float:
     n = max(0.0, min(1.0, value))
     return n*n*(3-2*n)
 
-def frame(seconds: float) -> Image.Image:
+def frame(seconds: float, sprite: Image.Image | None = None) -> Image.Image:
     """At the same timestamp, always draw the same frame."""
     img = Image.new('RGB', (WIDTH, HEIGHT), COLORS[0])
     d = ImageDraw.Draw(img)
@@ -77,6 +77,8 @@ def frame(seconds: float) -> Image.Image:
     box(71,y(51),18,6,'#b57fa6')
     box(71,y(57),18,5,'#5d8493')
     box(71,y(62),18,4,'#3e7d6b')
+    if sprite is not None:
+        img.paste(sprite,(70,y(50)),sprite)
     if opening>.75:
         box(78,y(59),6,7,'#283e55')
         box(78,y(57),2,3,'#283e55')
@@ -116,9 +118,15 @@ def frame(seconds: float) -> Image.Image:
         img=Image.blend(img,black,1-ease(seconds/.9))
     return img.resize((WIDTH*SCALE,HEIGHT*SCALE),Image.Resampling.NEAREST)
 
-def export(out: Path) -> None:
+def export(out: Path, window: Path | None = None) -> None:
     out.mkdir(parents=True,exist_ok=True)
-    frames=[frame(i/FPS) for i in range(FPS*DURATION)]
+    sprite = None
+    if window is not None:
+        with Image.open(window) as source:
+            if source.size != (20,17):
+                raise ValueError('Window PNG must be exactly 20x17 pixels')
+            sprite = source.convert('RGBA')
+    frames=[frame(i/FPS,sprite) for i in range(FPS*DURATION)]
     frames[0].save(out/'opening.gif',save_all=True,
                    append_images=frames[1:],duration=round(1000/FPS),
                    loop=0,optimize=False)
@@ -129,4 +137,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out',type=Path,
                         default=Path(__file__).parent/'outputs')
-    export(parser.parse_args().out)
+    parser.add_argument('--window',type=Path,help='optional 20x17 RGBA PNG exported from Pixelorama')
+    args=parser.parse_args()
+    export(args.out,args.window)
