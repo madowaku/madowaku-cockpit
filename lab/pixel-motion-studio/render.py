@@ -128,7 +128,7 @@ def export(out: Path, window: Path | None = None) -> None:
             sprite = source.convert('RGBA')
     frames=[frame(i/FPS,sprite) for i in range(FPS*DURATION)]
     frames[0].save(out/'opening.gif',save_all=True,
-                   append_images=frames[1:],duration=round(1000/FPS),
+                   append_images=frames[1:],duration=[80,80,90]*(FPS*DURATION//3),
                    loop=0,optimize=False)
     frames[-1].save(out/'poster.png')
     print(f'Generated {FPS*DURATION} frames ({DURATION}s): {out}')
