@@ -55,6 +55,12 @@ Use $font-librarian to review the current typography stack and determine whether
 Use $motion-librarian to add expand/collapse feedback while preserving the project's motion language and reduced-motion behavior.
 ```
 
+## Optional design → audit → polish pass
+
+For materially new UI or screen-level visual changes, `$ui-librarian` can coordinate a three-stage external review after inspecting local assets: **Anthropic Frontend Design → Vercel Web Design Guidelines → Make Interfaces Feel Better**. This is a small optional workflow, not three new librarian specialisms or a required global install.
+
+See [External UI Quality Triad](ui-librarian/references/external-ui-quality-triad.md) and [MGSF trial guide](../docs/ui-quality-triad.md) for source links, installation, review gates and the madowaku World pilot. Reuse-first decisions, accessibility and the project's own brand come first.
+
 ## Growth rule
 
 Add a new librarian only when a recurring class of UI decisions has enough distinct discovery, integration, accessibility, dependency, or verification rules to justify its own context. Do not split skills merely to create a larger taxonomy.
