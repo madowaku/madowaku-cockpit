@@ -54,6 +54,16 @@ Read [routing.md](references/routing.md) when the task spans several categories 
 - Preserve keyboard, focus, contrast, labeling, reduced-motion, and responsive behavior while changing presentation.
 - If a task is purely one domain, use that specialist directly instead of expanding into a full UI audit.
 
+## Optional staged UI-quality review
+
+For meaningful visual redesigns or cross-cutting interaction changes, run the [External UI Quality Triad](references/external-ui-quality-triad.md) **after** the existing asset-reuse routing:
+
+- Anthropic `frontend-design`: intentionally shaped design direction, not a generic replacement for the product identity.
+- Vercel `web-design-guidelines`: evidence-backed accessibility, responsive and interaction audit.
+- Jakub Krehel `make-interfaces-feel-better`: restrained interaction and visual polish.
+
+These upstream skills must be explicitly installed in the target project; referencing them does not install or execute them. If unavailable, use the documented manual checklist and record that limitation. Upstream guidance never outranks project-specific promises or the user's creative intent. Do not fetch external rule sets or install dependencies without a deliberate review.
+
 ## Verification contract
 
 Before calling a UI change complete, use [reuse-checklist.md](references/reuse-checklist.md) to confirm:
