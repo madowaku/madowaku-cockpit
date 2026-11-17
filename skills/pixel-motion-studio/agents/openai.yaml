@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pixel Motion Studio"
+  short_description: "Local-first pixel animation and retro-intro pipeline"
+  default_prompt: "Use $pixel-motion-studio to build a small reproducible pixel animation. Check local assets and licensing, start with the free Pixelorama/Pillow workflow, and avoid deploying to madowaku World."
