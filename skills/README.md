@@ -23,6 +23,7 @@ $ui-librarian
 | `font-librarian` | fonts, fallback stacks, font loading, typography asset integration | reuse the existing type system before adding a family |
 | `component-librarian` | controls, overlays, forms, navigation, reusable UI patterns | compose existing primitives before building a new component |
 | `motion-librarian` | transitions, animation feedback, motion runtime decisions | animate only when motion communicates state or continuity |
+| `pixel-motion-studio` | pixel-art intro GIFs, sprite exchange, retro animation | render a local free proof before installing additional tools |
 
 ## Common operating rule
 
@@ -60,3 +61,6 @@ Use $motion-librarian to add expand/collapse feedback while preserving the proje
 Add a new librarian only when a recurring class of UI decisions has enough distinct discovery, integration, accessibility, dependency, or verification rules to justify its own context. Do not split skills merely to create a larger taxonomy.
 
 Likely future candidates include illustration assets, color/theme systems, data visualization, sound feedback, and 3D/web-graphics assets.
+## Pixel Motion Studio (separate workshop)
+
+Use `$pixel-motion-studio` when the output is a pixel-art animated asset rather than an interface transition. Its first runnable example is [lab/pixel-motion-studio](../lab/pixel-motion-studio/README.md), with a reproducible 8-second GIF and optional Pixelorama PNG input. It is not routed by `$ui-librarian` by default, and does not change madowaku World.
