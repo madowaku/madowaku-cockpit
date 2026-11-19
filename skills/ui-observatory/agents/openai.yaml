@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Observatory"
+  short_description: "Manually research game UI and create original design briefs"
+  default_prompt: "Use $ui-observatory to record human-observed UI references with source URLs, analyze their transferable principles without scraping or copying assets, then route the original implementation through $ui-librarian and produce an AI Creole / Codex handoff."

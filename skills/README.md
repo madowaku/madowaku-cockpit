@@ -5,7 +5,9 @@ A reuse-first skill family for UI production. The shared rule is simple: **inspe
 ## Architecture
 
 ```text
-$ui-librarian
+$ui-observatory (optional game UI reference research)
+  ↓
+$ui-librarian (implementation orchestration)
   ├─ $icon-librarian
   ├─ $font-librarian
   ├─ $component-librarian
@@ -18,11 +20,17 @@ $ui-librarian
 
 | Skill | Use for | Core gate |
 | --- | --- | --- |
-| `ui-librarian` | cross-domain UI work and routing | inspect the local system, then load only the specialists required |
+| `ui-observatory` | manual game UI references and original design briefs | record source URLs and observations; never scrape or copy third-party assets |\n| `ui-librarian` | cross-domain UI work and routing | inspect the local system, then load only the specialists required |
 | `icon-librarian` | icon selection, normalization, animation, custom SVG decisions | search before drawing |
 | `font-librarian` | fonts, fallback stacks, font loading, typography asset integration | reuse the existing type system before adding a family |
 | `component-librarian` | controls, overlays, forms, navigation, reusable UI patterns | compose existing primitives before building a new component |
 | `motion-librarian` | transitions, animation feedback, motion runtime decisions | animate only when motion communicates state or continuity |
+
+## Game UI research before implementation
+
+For game interfaces that need external inspiration, use `$ui-observatory` first to record manually inspected reference URLs and human-authored observations, then consult `$ui-librarian` to translate transferable principles into an original UI within the local component, icon, typography and motion systems.
+
+The Observatory does **not** crawl Game UI Database, download reference images, train on them, or copy game screen designs. Reference URLs provide attribution and human navigation only.
 
 ## Common operating rule
 
