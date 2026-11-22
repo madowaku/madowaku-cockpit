@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useReducer, useRef, useState, type FormEvent } from 'react';
+import { confirmedReceiptChanges, workshopReceiptEdit } from './workshopReceiptEdit';
 import {
   firstWorkshopReceipt, isWorkshopReceipt, readWorkshopTransfer, shareWorkshopReceipt,
   workshopApplyModes, workshopCiStates, workshopRunStates,
@@ -15,14 +16,16 @@ export function WorkshopReceiptPanel({
   receipts, onSave, handoff
 }: {
   receipts: WorkshopReceipt[];
-  onSave: (receipt: WorkshopReceipt) => void;
+  onSave: (receipt: WorkshopReceipt, expected?: WorkshopReceipt) => Promise<void>;
   handoff: string;
 }) {
   const [message, setMessage] = useState('');
-  const [editing, setEditing] = useState<WorkshopReceipt | null>(null);
-  const [editVersion, setEditVersion] = useState(0);
+  const [edit, dispatch] = useReducer(workshopReceiptEdit, { version: 0 });
+  const [saving, setSaving] = useState(false);
+  const { draft: editing, previous, approval } = edit;
   const editor = useRef<HTMLDetailsElement>(null);
   const runIdInput = useRef<HTMLInputElement>(null);
+  const approvalHeading = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     if (!editing || !editor.current) return;
@@ -30,9 +33,30 @@ export function WorkshopReceiptPanel({
     runIdInput.current?.focus();
   }, [editing]);
 
+  useEffect(() => {
+    if (approval) approvalHeading.current?.focus();
+  }, [approval]);
+
   function openReceipt(receipt: WorkshopReceipt) {
-    setEditing({ ...receipt });
-    setEditVersion((version) => version + 1);
+    dispatch({ type: 'open', draft: receipt, previous: receipts.find(({ runId }) => runId === receipt.runId) });
+  }
+
+  function cancelEdit() {
+    dispatch({ type: 'close' });
+    setMessage('編集をキャンセルしました。');
+  }
+
+  async function persistReceipt(receipt: WorkshopReceipt, expected?: WorkshopReceipt) {
+    setSaving(true);
+    try {
+      await onSave(receipt, expected);
+      dispatch({ type: 'close' });
+      setMessage('結果票をこのプロジェクトに保存しました。');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : '結果票の保存を中止しました。');
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function copy(text: string, success: string) {
@@ -46,6 +70,7 @@ export function WorkshopReceiptPanel({
 
   function preview(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saving || approval) return;
     const form = event.currentTarget;
     const receipt = readWorkshopTransfer(String(new FormData(form).get('transfer') ?? ''), receipts);
     if (!receipt) {
@@ -59,6 +84,7 @@ export function WorkshopReceiptPanel({
 
   function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saving || approval) return;
     const form = event.currentTarget;
     const data = new FormData(form);
     const field = (name: string) => String(data.get(name) ?? '').trim();
@@ -72,10 +98,12 @@ export function WorkshopReceiptPanel({
       setMessage('入力を確認してください。PRとCIには、該当するGitHubのURLを入力してください。');
       return;
     }
-    onSave(receipt);
-    setEditing(null);
-    setEditVersion((version) => version + 1);
-    setMessage('結果票をこのプロジェクトに保存しました。');
+    const changes = confirmedReceiptChanges(previous, receipt);
+    if (changes.length) {
+      dispatch({ type: 'review', receipt, changes });
+      return;
+    }
+    void persistReceipt(receipt, previous);
   }
 
   return (
@@ -97,7 +125,7 @@ export function WorkshopReceiptPanel({
           <p><code>t3 thread show --messages 0 --json &lt;thread-id&gt;</code> の出力か、別端末でコピーした結果票を貼り付けます。</p>
           <form onSubmit={preview}>
             <label>結果の JSON<textarea name="transfer" required maxLength={16384} rows={4} /></label>
-            <button className="workshop-receipt-button" type="submit">取り込み内容を確認</button>
+            <button className="workshop-receipt-button" type="submit" disabled={saving || Boolean(approval)}>取り込み内容を確認</button>
           </form>
         </details>
       </div>
@@ -107,7 +135,7 @@ export function WorkshopReceiptPanel({
           <header className="workshop-receipt-heading">
             <h3>{receipt.task}</h3>
             <div className="workshop-receipt-actions">
-              <button className="workshop-receipt-button" type="button" aria-label={`${receipt.task} の結果票を編集`}
+              <button className="workshop-receipt-button" type="button" disabled={saving || Boolean(approval)} aria-label={`${receipt.task} の結果票を編集`}
                 onClick={() => openReceipt(receipt)}>編集</button>
               <button className="workshop-receipt-button" type="button" aria-label={`${receipt.task} の結果票をコピー`}
                 onClick={() => void copy(shareWorkshopReceipt(receipt), '結果票1件をコピーしました。')}>コピー</button>
@@ -125,16 +153,14 @@ export function WorkshopReceiptPanel({
         </article>
       ))}
       {!receipts.some(({ runId }) => runId === firstWorkshopReceipt.runId) && (
-        <button className="workshop-receipt-button" type="button" onClick={() => {
-          onSave(firstWorkshopReceipt);
-          setMessage('M0.1の実行記録を追加しました。');
-        }}>M0.1の実行記録を追加</button>
+        <button className="workshop-receipt-button" type="button" disabled={saving || Boolean(approval)}
+          onClick={() => void persistReceipt(firstWorkshopReceipt)}>M0.1の実行記録を追加</button>
       )}
       <details ref={editor}>
         <summary>{editing ? '結果票を編集' : '結果票を記録'}</summary>
         <p>未確認の欄は空欄または「未確認」のまま保存できます。</p>
-        <form key={editVersion} className="workshop-receipt-form" onSubmit={save}>
-          <label>実行ID<input name="runId" ref={runIdInput} required maxLength={200} defaultValue={editing?.runId} readOnly={editing !== null} /></label>
+        <form key={edit.version} className="workshop-receipt-form" onSubmit={save} inert={saving || Boolean(approval)}>
+          <label>実行ID<input name="runId" ref={runIdInput} required maxLength={200} defaultValue={editing?.runId} readOnly={Boolean(editing)} /></label>
           <label>担当AI<input name="agent" required maxLength={160} defaultValue={editing?.agent} /></label>
           <label className="workshop-task-input">タスク<input name="task" required maxLength={240} defaultValue={editing?.task} /></label>
           <label>実行状態<select name="state" defaultValue={editing?.state ?? 'unknown'}>
@@ -150,11 +176,26 @@ export function WorkshopReceiptPanel({
           <label>PR URL<input name="prUrl" type="url" maxLength={350} defaultValue={editing?.prUrl} /></label>
           <label>CI URL<input name="ciUrl" type="url" maxLength={350} defaultValue={editing?.ciUrl} /></label>
           <button className="workshop-receipt-button" type="submit">結果票を保存</button>
-          {editing && <button className="workshop-receipt-button" type="button" onClick={() => {
-            setEditing(null);
-            setEditVersion((version) => version + 1);
-          }}>編集をキャンセル</button>}
+          {editing && <button className="workshop-receipt-button" type="button" onClick={cancelEdit}>編集をキャンセル</button>}
         </form>
+        {approval && (
+          <section className="workshop-receipt-approval" aria-labelledby="workshop-approval-title">
+            <h3 ref={approvalHeading} tabIndex={-1} id="workshop-approval-title">記録済みの値を変更しますか？</h3>
+            <dl>
+              {approval.changes.map(({ label, before, after }) => (
+                <div key={label}><dt>{label}</dt><dd>変更前 {before}</dd><dd>変更後 {after}</dd></div>
+              ))}
+            </dl>
+            <div className="workshop-receipt-actions">
+              <button className="workshop-receipt-button" type="button" disabled={saving}
+                onClick={() => void persistReceipt(approval.receipt, previous)}>変更を承認して保存</button>
+              <button className="workshop-receipt-button" type="button" disabled={saving}
+                onClick={() => dispatch({ type: 'back' })}>入力に戻る</button>
+              <button className="workshop-receipt-button" type="button" disabled={saving}
+                onClick={cancelEdit}>編集をキャンセル</button>
+            </div>
+          </section>
+        )}
       </details>
       <p role="status">{message}</p>
     </section>

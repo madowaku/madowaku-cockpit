@@ -15,6 +15,14 @@ const task: CockpitTask = {
 };
 
 describe('backup helpers', () => {
+  it('rejects duplicate project IDs without rejecting older distinct projects', () => {
+    const first = { id: 'local-lab', name: 'Local Lab', description: '', task };
+    const second = { ...first, name: 'Second Lab' };
+    expect(() => restoreBackupText(createBackupText([first, second]))).toThrow('Invalid cockpit backup');
+    expect(restoreBackupText(createBackupText([first, { ...second, id: 'second' }])).map(({ id }) => id))
+      .toEqual(['local-lab', 'second']);
+  });
+
   it('creates a versioned JSON backup for cockpit projects', () => {
     const backupText = createBackupText([
       {

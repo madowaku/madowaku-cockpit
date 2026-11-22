@@ -899,6 +899,19 @@ textarea {
   flex-shrink: 0;
 }
 
+.workshop-receipt-approval {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #a57a26;
+  border-radius: 8px;
+  background: #fff5df;
+  overflow-wrap: anywhere;
+}
+
+.workshop-receipt-approval dl { display: grid; gap: 8px; }
+.workshop-receipt-approval dt { font-weight: 700; }
+.workshop-receipt-approval dd { margin-left: 0; }
+
 .workshop-transfer {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
