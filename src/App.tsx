@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { createBackupText, restoreBackupText } from './backup';
+import { createBackupText, restoreBackupText, type BackupProject } from './backup';
+import { StudioHome } from './StudioHome';
+import { emptyStudio, type Technology } from './studio';
 import { accessProjects, projectStorageKey, readStoredProjects, setWorkshopReceipt, type ProjectChange } from './projectStorage';
 import { WorkshopReceiptPanel } from './WorkshopReceiptPanel';
 import { firstWorkshopReceipt, isWorkshopReceipt, type WorkshopReceipt } from './workshopReceipts';
@@ -46,12 +48,7 @@ import {
   type TaskStatus
 } from './promptBuilders';
 
-type CockpitProject = Project & {
-  id: string;
-  task: CockpitTask;
-  packetHistory?: PacketHistoryEntry[];
-  workshopReceipts?: WorkshopReceipt[];
-};
+type CockpitProject = BackupProject;
 
 const emptyTask: CockpitTask = {
   title: 'First tiny tranche',
@@ -111,6 +108,8 @@ export default function App() {
   const [storageStatus, setStorageStatus] = useState('ローカル保存');
   const [backupStatus, setBackupStatus] = useState('手動バックアップでlocalStorageを守れます。');
   const [focusModeId, setFocusModeId] = useState<FocusModeId>('overview');
+  const [studioPacket, setStudioPacket] = useState<{ id: string; text: string }>();
+  const toolbox = useRef<HTMLDetailsElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
   const pendingWrites = useRef(0);
   const updates = useRef<BroadcastChannel | null>(null);
@@ -253,6 +252,36 @@ export default function App() {
     return persist((current) => setWorkshopReceipt(current, activeProject.id, receipt, expected), false);
   }
 
+  function updateStudioBrief(brief: string) {
+    autosave((current) => current.map((project) => project.id === activeProject.id
+      ? { ...project, studio: { ...(project.studio ?? emptyStudio), brief } }
+      : project));
+  }
+
+  function saveStudioTechnology(technology: Technology, ownerId: string, previous?: Technology) {
+    return persist((current) => {
+      const owner = current.find(({ id }) => id === ownerId);
+      if (!owner) throw new Error('保存先のプロジェクトが見つかりません。');
+      const studio = owner.studio ?? emptyStudio;
+      const latest = studio.technologies.find(({ id }) => id === technology.id);
+      if (JSON.stringify(latest) !== JSON.stringify(previous)) {
+        throw new Error('技術記録が他のタブで更新されています。最新の内容を確認してください。');
+      }
+      const updated = { ...studio, technologies: [technology, ...studio.technologies.filter(({ id }) => id !== technology.id)] };
+      return current.map((project) => project.id === ownerId ? { ...project, studio: updated } : project);
+    }, false);
+  }
+
+  function openToolbox(focusReceipts = false) {
+    if (!toolbox.current) return;
+    toolbox.current.open = true;
+    const target = focusReceipts
+      ? document.getElementById('workshop-receipts-title')
+      : toolbox.current.querySelector('summary');
+    target?.scrollIntoView({ block: 'start' });
+    target?.focus({ preventScroll: true });
+  }
+
   function addProject() {
     const nextProject: CockpitProject = {
       id: crypto.randomUUID(),
@@ -372,7 +401,21 @@ export default function App() {
   }
 
   return (
-    <main className="cockpit-shell">
+    <>
+    <StudioHome key={activeProject.id} currentId={activeProject.id} projects={projects}
+      studio={activeProject.studio ?? emptyStudio}
+      catalog={projects.flatMap(({ id, studio }) => (studio?.technologies ?? []).map((technology) => ({ ownerId: id, technology })))}
+      receipts={receiptsFor(activeProject)} storageStatus={storageStatus} onProject={setActiveProjectId}
+      onBrief={updateStudioBrief} onTechnology={saveStudioTechnology} onToolbox={openToolbox}
+      onCopy={(text) => copyPrompt('Creative Studio', text)}
+      onPacket={(text) => setStudioPacket({ id: activeProject.id, text })}
+      onScout={(technology) => buildMadowakuScoutAdoptPrompt(activeProject, {
+        ...activeProject.task, title: technology.name, roughGoal: technology.purpose,
+        contextPack: JSON.stringify({ source: technology.url, license: technology.license, evidence: technology.evidence })
+      })} />
+    <details className="studio-toolbox" ref={toolbox}>
+    <summary>道具箱 <span>プロジェクト・AI Crew・受け渡し・結果票</span></summary>
+    <div className="cockpit-shell">
       <aside className="project-rail" aria-label="Projects">
         <div>
           <p className="eyebrow">Madowaku</p>
@@ -634,7 +677,7 @@ export default function App() {
           />
           <NoteField label="Logs" value={activeProject.task.logs} onChange={(logs) => updateTask({ logs })} tall />
           <WorkshopReceiptPanel key={activeProject.id} receipts={receiptsFor(activeProject)}
-            onSave={saveWorkshopReceipt} handoff={prompts.creole} />
+            onSave={saveWorkshopReceipt} handoff={(studioPacket?.id === activeProject.id && studioPacket.text) || prompts.creole} />
           <section className="trace-actions" aria-label="TRACE reflection">
             <div>
               <span>TRACE化</span>
@@ -667,7 +710,9 @@ export default function App() {
           {copied ? `${copied} copied` : 'Prompts are generated locally from the fields above.'}
         </p>
       </section>
-    </main>
+    </div>
+    </details>
+    </>
   );
 }
 

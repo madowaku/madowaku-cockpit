@@ -109,7 +109,7 @@ export function WorkshopReceiptPanel({
   return (
     <section className="workshop-receipts" aria-labelledby="workshop-receipts-title">
       <header>
-        <h2 id="workshop-receipts-title">工房の結果票</h2>
+        <h2 id="workshop-receipts-title" tabIndex={-1}>工房の結果票</h2>
         <p>Logs / Review に添える実行記録。保存先はこのブラウザーです。</p>
       </header>
       <div className="workshop-transfer">
