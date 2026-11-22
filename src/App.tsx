@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBackupText, restoreBackupText } from './backup';
-import { projectStorageKey, readStoredProjects, setWorkshopReceipt, writeProjects, type ProjectChange } from './projectStorage';
+import { accessProjects, projectStorageKey, readStoredProjects, setWorkshopReceipt, type ProjectChange } from './projectStorage';
 import { WorkshopReceiptPanel } from './WorkshopReceiptPanel';
 import { firstWorkshopReceipt, isWorkshopReceipt, type WorkshopReceipt } from './workshopReceipts';
 import {
@@ -88,9 +88,13 @@ function safeFilePart(value: string) {
   );
 }
 
+function readLegacyProjects() {
+  return readStoredProjects(localStorage, starterProjects);
+}
+
 function loadProjects() {
   try {
-    return readStoredProjects(localStorage, starterProjects);
+    return readLegacyProjects();
   } catch {
     return starterProjects;
   }
@@ -109,34 +113,59 @@ export default function App() {
   const [focusModeId, setFocusModeId] = useState<FocusModeId>('overview');
   const importInputRef = useRef<HTMLInputElement>(null);
   const pendingWrites = useRef(0);
+  const updates = useRef<BroadcastChannel | null>(null);
 
   const activeProject = projects.find((project) => project.id === activeProjectId) ?? projects[0];
 
   useEffect(() => {
-    function refresh(event: StorageEvent) {
-      if (!pendingWrites.current && (event.key === projectStorageKey || event.key === null)) {
-        setProjects(loadProjects());
+    let active = true;
+    let revision = 0;
+    async function refresh() {
+      const request = ++revision;
+      try {
+        const saved = await accessProjects(window.indexedDB, readLegacyProjects);
+        if (active && request === revision && !pendingWrites.current) setProjects(saved);
+      } catch {
+        // Keep the last readable view when storage access is blocked.
       }
     }
-    window.addEventListener('storage', refresh);
-    return () => window.removeEventListener('storage', refresh);
+    if (typeof BroadcastChannel !== 'undefined') {
+      updates.current = new BroadcastChannel(projectStorageKey);
+      updates.current.addEventListener('message', refresh);
+    }
+    void refresh();
+    window.addEventListener('focus', refresh);
+    return () => {
+      active = false;
+      updates.current?.close();
+      updates.current = null;
+      window.removeEventListener('focus', refresh);
+    };
   }, []);
 
   async function persist(change: ProjectChange, optimistic = true) {
     pendingWrites.current += 1;
     setStorageStatus('保存中…');
     try {
-      const locks = navigator.locks;
-      if (optimistic && locks) setProjects(change);
-      await writeProjects(localStorage, locks, starterProjects, change);
+      const database = window.indexedDB;
+      if (optimistic && database) setProjects(change);
+      const saved = await accessProjects(database, readLegacyProjects, change);
+      if (pendingWrites.current === 1) setProjects(saved);
       setStorageStatus('このブラウザーに保存済み');
+      updates.current?.postMessage('updated');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'ローカル保存を中止しました。';
       setStorageStatus(`保存できませんでした。 ${message}`);
+      if (optimistic && pendingWrites.current === 1) {
+        try {
+          setProjects(await accessProjects(window.indexedDB, readLegacyProjects));
+        } catch {
+          // Preserve the visible input so the person can copy it after a failed write.
+        }
+      }
       throw error;
     } finally {
       pendingWrites.current -= 1;
-      if (!pendingWrites.current) setProjects(loadProjects());
     }
   }
 
@@ -280,10 +309,14 @@ export default function App() {
     window.setTimeout(() => setCopied(null), 1400);
   }
 
-  function exportBackup() {
+  async function exportBackup() {
+    if (pendingWrites.current) {
+      setBackupStatus('保存完了後にバックアップを書き出してください。');
+      return;
+    }
     let backupText;
     try {
-      backupText = createBackupText(readStoredProjects(localStorage, starterProjects));
+      backupText = createBackupText(await accessProjects(window.indexedDB, readLegacyProjects));
     } catch {
       setBackupStatus('保存済みデータを読み取れないため、書き出しを中止しました。');
       return;
