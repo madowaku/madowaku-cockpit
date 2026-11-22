@@ -1,0 +1,31 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+  background: #101821;
+  color: #e9f1ef;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 700px; margin: 0 auto; padding: 24px 28px 36px; }
+header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.symbol { font-size: 40px; }
+h1 { font-size: 27px; margin: 2px 0 5px; }
+header p, .muted, footer { color: #a8b9bf; }
+header p { margin: 0; font-size: 13px; }
+.overline { font-size: 10px; color: #8ed4c6; letter-spacing: .18em; }
+.panel { background: #1c2933; border: 1px solid #30424b; border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+h2 { font-size: 16px; font-weight: 600; margin: 0 0 14px; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+button, select, textarea { font: inherit; }
+button { background: #a9e5cb; border: 1px solid transparent; border-radius: 9px; color: #10221d; cursor: pointer; padding: 9px 13px; }
+button.secondary { background: #283a43; border-color: #45606c; color: #e9f1ef; }
+button.link { background: transparent; color: #a9e5cb; text-decoration: underline; }
+button:disabled, select:disabled, textarea:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #a9e5cb; outline-offset: 3px; }
+select { flex: 1; min-width: 180px; border: 1px solid #45606c; border-radius: 9px; padding: 10px; background: #101821; color: #e9f1ef; }
+label { display: block; font-size: 13px; margin-bottom: 8px; }
+textarea { width: 100%; display: block; resize: vertical; background: #101821; color: #e9f1ef; border: 1px solid #45606c; border-radius: 9px; padding: 12px; margin-bottom: 12px; }
+.result { display: block; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 70px; margin-top: 12px; background: #101821; border-radius: 10px; padding: 14px; }
+.muted, footer { font-size: 12px; line-height: 1.6; }
+#notice { color: #f5c7ab; min-height: 1.4em; }
+footer { margin-top: 16px; }
