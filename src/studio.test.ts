@@ -1,9 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { createBackupText, restoreBackupText, type BackupProject } from './backup';
-import { buildStudioPacket, isTechnology, pocketBrief, pocketTechnology, suggestStudioMethods } from './studio';
+import { buildStudioPacket, isTechnology, pocketBrief, pocketTechnology, suggestStudioMethods, voxaTechnology } from './studio';
 import { firstWorkshopReceipt } from './workshopReceipts';
 
 describe('Creative Studio', () => {
+  it('keeps bundled VOXA in candidate status until the actual service and voice rights are reviewed', () => {
+    expect(isTechnology(voxaTechnology)).toBe(true);
+    expect(voxaTechnology.status).toBe('candidate');
+    expect(voxaTechnology.kind).toBe('sound');
+    expect(voxaTechnology.url).toBe('https://voxavocals.com/');
+    expect(voxaTechnology.license).toContain('未確認');
+    expect(voxaTechnology.cost).toContain('未確認');
+    expect(suggestStudioMethods('日本語の音声ガイドを作る', [voxaTechnology]).reusable).toBeUndefined();
+  });
+
   it('keeps unknown candidates distinct and requires evidence for a reviewed state', () => {
     const unknown = { ...pocketTechnology, evidence: '', checked: '', status: 'candidate' };
     expect(isTechnology(unknown)).toBe(true);
