@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>madowaku AI Gateway M0.1</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./renderer.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="symbol" aria-hidden="true">🪟</div>
+      <div>
+        <p class="overline">LOCAL EXPERIMENT / M0.1</p>
+        <h1>madowaku AI Gateway</h1>
+        <p>ChatGPT公式DevKitの接続実験</p>
+      </div>
+    </header>
+    <section class="panel">
+      <h2>01　接続</h2>
+      <p id="status" role="status">確認中...</p>
+      <p id="account" class="muted"></p>
+      <div class="actions">
+        <button id="sign-in">ChatGPTでログイン</button>
+        <button id="reconsent" class="secondary">利用枠を許可</button>
+        <button id="disconnect" class="secondary">切断</button>
+        <button id="usage" class="link">利用状況を見る</button>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>02　モデルを選ぶ</h2>
+      <div class="actions">
+        <select id="model" aria-label="モデル"><option value="">接続後に取得</option></select>
+        <button id="refresh" class="secondary">モデル一覧を更新</button>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>03　1回だけ生成</h2>
+      <label for="prompt">テストメッセージ（最大500文字）</label>
+      <textarea id="prompt" maxlength="500" rows="3">こんにちは！madowakuへようこそ。</textarea>
+      <button id="generate">生成テスト</button>
+      <p class="muted">クリックした時だけ送信します。自動再試行やAPI課金への切替はありません。</p>
+      <output id="result" class="result" aria-live="polite">ここに生成結果が表示されます。</output>
+    </section>
+    <p id="notice" role="alert"></p>
+    <footer>資格情報はローカルのOS暗号化ストアで保護。公開Web版・MCPとは接続していません。</footer>
+  </main>
+</body>
+</html>

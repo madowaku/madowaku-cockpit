@@ -37,3 +37,6 @@ jobs:
 
       - name: Smoke read-only MCP bridge
         run: npm run mcp:smoke
+
+      - name: Test isolated SIWC gateway policies
+        run: node --test experiments/siwc-gateway/test/*.node-test.mjs
