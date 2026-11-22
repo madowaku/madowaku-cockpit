@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { PocketWindow } from './PocketWindow';
 import {
-  buildStudioPacket, isTechnology, pocketBrief, pocketTechnology, studioKinds, suggestStudioMethods,
+  buildStudioPacket, isTechnology, pocketBrief, pocketTechnology, voxaTechnology, studioKinds, suggestStudioMethods,
   technologyFields, technologyStates, type StudioRecord, type Technology
 } from './studio';
 import { workshopCiStates, workshopRunStates, type WorkshopReceipt } from './workshopReceipts';
@@ -40,7 +40,9 @@ export function StudioHome({
   const [editing, setEditing] = useState<CatalogEntry>();
   const [saving, setSaving] = useState(false);
   const idea = studio.brief;
-  const result = suggestStudioMethods(idea, catalog.map(({ technology }) => technology));
+  const catalogEntries = catalog.some(({ technology }) => technology.id === voxaTechnology.id)
+    ? catalog : [...catalog, { ownerId: '__bundled__', technology: voxaTechnology }];
+  const result = suggestStudioMethods(idea, catalogEntries.map(({ technology }) => technology));
   const delivered = receipts.filter(({ prUrl }) => Boolean(prUrl));
   const running = receipts.filter(({ state }) => state === 'running' || state === 'blocked');
 
@@ -201,7 +203,7 @@ export function StudioHome({
       </div>
 
       <details className="studio-paper studio-library" id="studio-library" ref={library}>
-        <summary>技術図鑑 <span>{catalog.length}件</span></summary>
+        <summary>技術図鑑 <span>{catalogEntries.length}件</span></summary>
         <p>調べたこと、試したこと、採用を決めたものを記録します。出典は開いて確認できます。</p>
         {!catalog.some(({ technology }) => technology.id === pocketTechnology.id) && <>
           <p>Pocket Window に使った Canvas 2D。追加パッケージはありません。 <a href={pocketTechnology.url}>出典を確認</a></p>
@@ -209,17 +211,20 @@ export function StudioHome({
             onClick={() => void storeTechnology(pocketTechnology, currentId)}>Pocket Window の技術を登録</button>
         </>}
         <div className="studio-library-list">
-          {catalog.map((entry) => {
+          {catalogEntries.map((entry) => {
             const item = entry.technology;
+            const bundled = entry.ownerId === '__bundled__';
             return <article key={`${entry.ownerId}:${item.id}`} className="studio-method">
-              <span>{technologyStates[item.status]} · {studioKinds[item.kind]}</span>
+              <span>{technologyStates[item.status]} · {studioKinds[item.kind]}{bundled && ' · 同梱候補'}</span>
               <h3>{item.name}</h3>
               <a href={item.url}>公式・登録出典</a>
               <dl>{(Object.entries(technologyFields) as [keyof typeof technologyFields, string][])
                 .filter(([key]) => key !== 'url' && key !== 'name')
                 .map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{short(item[key])}</dd></div>)}</dl>
               <div className="studio-actions">
-                <button type="button" disabled={saving} onClick={() => editTechnology(entry)}>編集</button>
+                {bundled
+                  ? <button type="button" disabled={saving} onClick={() => void storeTechnology(item, currentId)}>プロジェクトに保存</button>
+                  : <button type="button" disabled={saving} onClick={() => editTechnology(entry)}>編集</button>}
                 <button type="button" onClick={() => void copyPacket(onScout(item), setLibraryMessage, 'Scout / Adopt の調査依頼をコピーしました。')}>Scout / Adopt をコピー</button>
               </div>
             </article>;
