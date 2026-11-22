@@ -911,6 +911,7 @@ textarea {
 .workshop-receipt-approval dl { display: grid; gap: 8px; }
 .workshop-receipt-approval dt { font-weight: 700; }
 .workshop-receipt-approval dd { margin-left: 0; }
+.workshop-receipt-form[hidden] { display: none; }
 
 .workshop-transfer {
   display: grid;

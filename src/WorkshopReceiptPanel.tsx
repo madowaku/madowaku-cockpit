@@ -159,7 +159,7 @@ export function WorkshopReceiptPanel({
       <details ref={editor}>
         <summary>{editing ? '結果票を編集' : '結果票を記録'}</summary>
         <p>未確認の欄は空欄または「未確認」のまま保存できます。</p>
-        <form key={edit.version} className="workshop-receipt-form" onSubmit={save} inert={saving || Boolean(approval)}>
+        <form key={edit.version} className="workshop-receipt-form" onSubmit={save} hidden={Boolean(approval)} inert={saving}>
           <label>実行ID<input name="runId" ref={runIdInput} required maxLength={200} defaultValue={editing?.runId} readOnly={Boolean(editing)} /></label>
           <label>担当AI<input name="agent" required maxLength={160} defaultValue={editing?.agent} /></label>
           <label className="workshop-task-input">タスク<input name="task" required maxLength={240} defaultValue={editing?.task} /></label>
