@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import {
-  firstWorkshopReceipt, isWorkshopReceipt, workshopApplyModes, workshopCiStates, workshopRunStates,
+  firstWorkshopReceipt, isWorkshopReceipt, readWorkshopTransfer, shareWorkshopReceipt,
+  workshopApplyModes, workshopCiStates, workshopRunStates,
   type WorkshopReceipt
 } from './workshopReceipts';
 
@@ -11,13 +12,15 @@ function duration(seconds: number | null) {
 }
 
 export function WorkshopReceiptPanel({
-  receipts, onSave
+  receipts, onSave, handoff
 }: {
   receipts: WorkshopReceipt[];
   onSave: (receipt: WorkshopReceipt) => void;
+  handoff: string;
 }) {
   const [message, setMessage] = useState('');
   const [editing, setEditing] = useState<WorkshopReceipt | null>(null);
+  const [editVersion, setEditVersion] = useState(0);
   const editor = useRef<HTMLDetailsElement>(null);
   const runIdInput = useRef<HTMLInputElement>(null);
 
@@ -26,6 +29,33 @@ export function WorkshopReceiptPanel({
     editor.current.open = true;
     runIdInput.current?.focus();
   }, [editing]);
+
+  function openReceipt(receipt: WorkshopReceipt) {
+    setEditing({ ...receipt });
+    setEditVersion((version) => version + 1);
+  }
+
+  async function copy(text: string, success: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setMessage(success);
+    } catch {
+      setMessage('コピーできませんでした。ブラウザーのクリップボード権限を確認してください。');
+    }
+  }
+
+  function preview(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const receipt = readWorkshopTransfer(String(new FormData(form).get('transfer') ?? ''), receipts);
+    if (!receipt) {
+      setMessage('T3 CLI の JSON またはコピーした結果票を確認してください。');
+      return;
+    }
+    openReceipt(receipt);
+    form.reset();
+    setMessage('入力欄に反映しました。内容を確認してから保存してください。');
+  }
 
   function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -43,8 +73,8 @@ export function WorkshopReceiptPanel({
       return;
     }
     onSave(receipt);
-    form.reset();
     setEditing(null);
+    setEditVersion((version) => version + 1);
     setMessage('結果票をこのプロジェクトに保存しました。');
   }
 
@@ -52,15 +82,36 @@ export function WorkshopReceiptPanel({
     <section className="workshop-receipts" aria-labelledby="workshop-receipts-title">
       <header>
         <h2 id="workshop-receipts-title">工房の結果票</h2>
-        <p>Logs / Review に添える確認済みの実行記録。状態とCIは手動で記録します。</p>
+        <p>Logs / Review に添える実行記録。保存先はこのブラウザーです。</p>
       </header>
+      <div className="workshop-transfer">
+        <details>
+          <summary>AI Creole を渡す</summary>
+          <p>内容を確認し、T3 Code の対象プロジェクトで貼り付けて送信します。</p>
+          <textarea aria-label="T3 に渡す AI Creole" readOnly value={handoff} rows={6} />
+          <button className="workshop-receipt-button workshop-transfer-primary" type="button"
+            onClick={() => void copy(handoff, 'AI Creole をコピーしました。')}>AI Creole をコピー</button>
+        </details>
+        <details>
+          <summary>実行結果を取り込む</summary>
+          <p><code>t3 thread show --messages 0 --json &lt;thread-id&gt;</code> の出力か、別端末でコピーした結果票を貼り付けます。</p>
+          <form onSubmit={preview}>
+            <label>結果の JSON<textarea name="transfer" required maxLength={16384} rows={4} /></label>
+            <button className="workshop-receipt-button" type="submit">取り込み内容を確認</button>
+          </form>
+        </details>
+      </div>
       {receipts.length === 0 && <p>このプロジェクトに実行記録はありません。</p>}
       {receipts.map((receipt) => (
         <article className="workshop-receipt" key={receipt.runId}>
           <header className="workshop-receipt-heading">
             <h3>{receipt.task}</h3>
-            <button className="workshop-receipt-button" type="button" aria-label={`${receipt.task} の結果票を編集`}
-              onClick={() => setEditing(receipt)}>編集</button>
+            <div className="workshop-receipt-actions">
+              <button className="workshop-receipt-button" type="button" aria-label={`${receipt.task} の結果票を編集`}
+                onClick={() => openReceipt(receipt)}>編集</button>
+              <button className="workshop-receipt-button" type="button" aria-label={`${receipt.task} の結果票をコピー`}
+                onClick={() => void copy(shareWorkshopReceipt(receipt), '結果票1件をコピーしました。')}>コピー</button>
+            </div>
           </header>
           <dl>
             <div><dt>担当AI</dt><dd>{receipt.agent}</dd></div>
@@ -82,7 +133,7 @@ export function WorkshopReceiptPanel({
       <details ref={editor}>
         <summary>{editing ? '結果票を編集' : '結果票を記録'}</summary>
         <p>未確認の欄は空欄または「未確認」のまま保存できます。</p>
-        <form key={editing?.runId ?? 'new'} className="workshop-receipt-form" onSubmit={save}>
+        <form key={editVersion} className="workshop-receipt-form" onSubmit={save}>
           <label>実行ID<input name="runId" ref={runIdInput} required maxLength={200} defaultValue={editing?.runId} readOnly={editing !== null} /></label>
           <label>担当AI<input name="agent" required maxLength={160} defaultValue={editing?.agent} /></label>
           <label className="workshop-task-input">タスク<input name="task" required maxLength={240} defaultValue={editing?.task} /></label>
@@ -99,7 +150,10 @@ export function WorkshopReceiptPanel({
           <label>PR URL<input name="prUrl" type="url" maxLength={350} defaultValue={editing?.prUrl} /></label>
           <label>CI URL<input name="ciUrl" type="url" maxLength={350} defaultValue={editing?.ciUrl} /></label>
           <button className="workshop-receipt-button" type="submit">結果票を保存</button>
-          {editing && <button className="workshop-receipt-button" type="button" onClick={() => setEditing(null)}>編集をキャンセル</button>}
+          {editing && <button className="workshop-receipt-button" type="button" onClick={() => {
+            setEditing(null);
+            setEditVersion((version) => version + 1);
+          }}>編集をキャンセル</button>}
         </form>
       </details>
       <p role="status">{message}</p>

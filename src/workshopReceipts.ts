@@ -77,3 +77,47 @@ export function isWorkshopReceipt(value: unknown): value is WorkshopReceipt {
     isGitHubLink(receipt.prUrl, /^\/[\w.-]+\/[\w.-]+\/pull\/\d+\/?$/) &&
     isGitHubLink(receipt.ciUrl, /^\/[\w.-]+\/[\w.-]+\/(?:actions\/runs\/\d+(?:\/job\/\d+)?|pull\/\d+\/checks)\/?$/);
 }
+
+const sharingSchema = 'madowaku.workshop_receipt.v1';
+
+function receiptFields(receipt: WorkshopReceipt): WorkshopReceipt {
+  const { runId, agent, task, state, elapsedSeconds, applyMode, prUrl, ci, ciUrl } = receipt;
+  return { runId, agent, task, state, elapsedSeconds, applyMode, prUrl, ci, ciUrl };
+}
+
+export function shareWorkshopReceipt(receipt: WorkshopReceipt) {
+  return JSON.stringify({ schema: sharingSchema, receipt: receiptFields(receipt) }, null, 2);
+}
+
+export function readWorkshopTransfer(text: string, receipts: WorkshopReceipt[]): WorkshopReceipt | null {
+  if (text.length > 16_384) return null;
+  try {
+    const input = JSON.parse(text);
+    if (input?.schema === sharingSchema) {
+      return isWorkshopReceipt(input.receipt) ? receiptFields(input.receipt) : null;
+    }
+
+    const thread = input?.thread;
+    if (typeof thread?.providerInstanceId !== 'string' || !thread.providerInstanceId.trim() ||
+        typeof thread.model !== 'string' || !thread.model.trim()) return null;
+
+    const existing = receipts.find((receipt) => receipt.runId === thread.latestRunId);
+    const waiting = thread.status === 'waiting' ||
+      (thread.status === 'running' && Number.isSafeInteger(thread.pendingRequestCount) && thread.pendingRequestCount > 0);
+    const status = waiting ? 'blocked' : thread.status;
+    const receipt = {
+      runId: thread.latestRunId,
+      agent: `T3 Code / ${thread.providerInstanceId} / ${thread.model}`,
+      task: existing?.task ?? thread.title,
+      state: isOption(status, workshopRunStates) ? status : 'unknown',
+      elapsedSeconds: existing?.elapsedSeconds ?? null,
+      applyMode: existing?.applyMode ?? 'unknown',
+      prUrl: existing?.prUrl ?? '',
+      ci: existing?.ci ?? 'unknown',
+      ciUrl: existing?.ciUrl ?? ''
+    };
+    return isWorkshopReceipt(receipt) ? receipt : null;
+  } catch {
+    return null;
+  }
+}
