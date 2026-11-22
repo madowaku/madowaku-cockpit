@@ -7,7 +7,7 @@
   "engines": { "node": ">=22" },
   "scripts": {
     "start": "electron .",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.node-test.mjs"
   },
   "dependencies": {
     "@siwc/local": "file:../../../sign-in-with-chatgpt-devkit/packages/local"
