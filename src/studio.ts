@@ -76,6 +76,20 @@ export const pocketTechnology: Technology = {
   status: 'trialed'
 };
 
+export const voxaTechnology: Technology = {
+  id: 'voxa-vocals-tts', name: 'VOXA (voxavocals.com)',
+  url: 'https://voxavocals.com/',
+  kind: 'sound', purpose: 'RAPIPPOの短い案内、触れる博物館の音声ガイド、Pocket Windowの語りを日本語TTSで試す',
+  license: 'サービス規約・音声モデルのライセンス・生成音声の公開/商用利用条件は未確認。',
+  cost: '無料枠・文字数上限・課金条件は未確認。無課金で試せる範囲を先に確認。',
+  platforms: 'Webでの利用を想定。日本語TTS、スマホ操作、音声書き出しは未検証。',
+  checked: '2026-11-22 · URL収集のみ。公式サイトの内容と規約は再確認が必要。',
+  requirements: '短い日本語台詞3本・声の違い・発音/速度・音声保存・スマホ実機の動作を確認。',
+  risks: '外部送信・原稿の保存先・モデル/生成物の権利・AI音声の表示義務・自動再生を確認。未公開原稿は投入しない。',
+  evidence: '出典URLを登録。機能・価格・ライセンスの一次情報確認と実機検証は未了。',
+  status: 'candidate'
+};
+
 type Method = { name: string; why: string; cost: string; check: string; skills: string };
 const methods: Record<StudioKind, [Method, Method]> = {
   window: [
