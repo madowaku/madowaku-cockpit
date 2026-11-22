@@ -45,7 +45,12 @@ export function restoreBackupText(backupText: string) {
 
 function isBackupPayload(value: unknown): value is BackupPayload {
   if (!isRecord(value)) return false;
-  return value.version === 1 && Array.isArray(value.projects) && value.projects.every(isBackupProject);
+  return value.version === 1 && isProjectCollection(value.projects);
+}
+
+export function isProjectCollection(value: unknown): value is BackupProject[] {
+  return Array.isArray(value) && value.length > 0 && value.every(isBackupProject) &&
+    new Set(value.map((project) => project.id)).size === value.length;
 }
 
 function isBackupProject(value: unknown): value is BackupProject {

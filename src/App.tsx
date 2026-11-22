@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBackupText, restoreBackupText } from './backup';
+import { projectStorageKey, readStoredProjects, setWorkshopReceipt, writeProjects, type ProjectChange } from './projectStorage';
 import { WorkshopReceiptPanel } from './WorkshopReceiptPanel';
 import { firstWorkshopReceipt, isWorkshopReceipt, type WorkshopReceipt } from './workshopReceipts';
 import {
@@ -52,8 +53,6 @@ type CockpitProject = Project & {
   workshopReceipts?: WorkshopReceipt[];
 };
 
-const storageKey = 'madowaku-codex-cockpit-v0-1';
-
 const emptyTask: CockpitTask = {
   title: 'First tiny tranche',
   roughGoal: '',
@@ -91,10 +90,7 @@ function safeFilePart(value: string) {
 
 function loadProjects() {
   try {
-    const saved = localStorage.getItem(storageKey);
-    if (!saved) return starterProjects;
-    const parsed = JSON.parse(saved) as CockpitProject[];
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : starterProjects;
+    return readStoredProjects(localStorage, starterProjects);
   } catch {
     return starterProjects;
   }
@@ -108,15 +104,47 @@ export default function App() {
   const [projects, setProjects] = useState<CockpitProject[]>(loadProjects);
   const [activeProjectId, setActiveProjectId] = useState(projects[0]?.id ?? starterProjects[0].id);
   const [copied, setCopied] = useState<string | null>(null);
+  const [storageStatus, setStorageStatus] = useState('ローカル保存');
   const [backupStatus, setBackupStatus] = useState('手動バックアップでlocalStorageを守れます。');
   const [focusModeId, setFocusModeId] = useState<FocusModeId>('overview');
   const importInputRef = useRef<HTMLInputElement>(null);
+  const pendingWrites = useRef(0);
 
   const activeProject = projects.find((project) => project.id === activeProjectId) ?? projects[0];
 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(projects));
-  }, [projects]);
+    function refresh(event: StorageEvent) {
+      if (!pendingWrites.current && (event.key === projectStorageKey || event.key === null)) {
+        setProjects(loadProjects());
+      }
+    }
+    window.addEventListener('storage', refresh);
+    return () => window.removeEventListener('storage', refresh);
+  }, []);
+
+  async function persist(change: ProjectChange, optimistic = true) {
+    pendingWrites.current += 1;
+    setStorageStatus('保存中…');
+    try {
+      const locks = navigator.locks;
+      if (optimistic && locks) setProjects(change);
+      await writeProjects(localStorage, locks, starterProjects, change);
+      setStorageStatus('このブラウザーに保存済み');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'ローカル保存を中止しました。';
+      setStorageStatus(`保存できませんでした。 ${message}`);
+      throw error;
+    } finally {
+      pendingWrites.current -= 1;
+      if (!pendingWrites.current) setProjects(loadProjects());
+    }
+  }
+
+  function autosave(change: ProjectChange) {
+    void persist(change).catch(() => {
+      // The save error is shown beside the project fields.
+    });
+  }
 
   const prompts = useMemo(
     () => ({
@@ -179,23 +207,21 @@ export default function App() {
     return `${baseClass} focus-muted`;
   }
   function updateProject(patch: Partial<Project>) {
-    setProjects((current) =>
+    autosave((current) =>
       current.map((project) => (project.id === activeProject.id ? { ...project, ...patch } : project))
     );
   }
 
   function updateTask(patch: Partial<CockpitTask>) {
-    setProjects((current) =>
+    autosave((current) =>
       current.map((project) =>
         project.id === activeProject.id ? { ...project, task: { ...project.task, ...patch } } : project
       )
     );
   }
 
-  function saveWorkshopReceipt(receipt: WorkshopReceipt) {
-    setProjects((current) => current.map((project) => project.id === activeProject.id
-      ? { ...project, workshopReceipts: [receipt, ...receiptsFor(project).filter(({ runId }) => runId !== receipt.runId)] }
-      : project));
+  function saveWorkshopReceipt(receipt: WorkshopReceipt, expected?: WorkshopReceipt) {
+    return persist((current) => setWorkshopReceipt(current, activeProject.id, receipt, expected), false);
   }
 
   function addProject() {
@@ -205,8 +231,9 @@ export default function App() {
       description: '',
       task: { ...emptyTask, title: 'New working thread' }
     };
-    setProjects((current) => [...current, nextProject]);
-    setActiveProjectId(nextProject.id);
+    void persist((current) => [...current, nextProject], false)
+      .then(() => setActiveProjectId(nextProject.id))
+      .catch(() => {});
   }
 
   function applyWorkflowTemplate(templateId: (typeof workflowTemplates)[number]['id']) {
@@ -222,15 +249,16 @@ export default function App() {
 
   function saveCurrentPacket() {
     const entry = createPacketHistoryEntry(activeProject, activeProject.task);
-    setProjects((current) =>
+    void persist((current) =>
       current.map((project) =>
         project.id === activeProject.id
           ? { ...project, packetHistory: trimPacketHistory([entry, ...(project.packetHistory ?? [])]) }
           : project
       )
-    );
-    setCopied('Latest useful packet saved');
-    window.setTimeout(() => setCopied(null), 1400);
+    ).then(() => {
+      setCopied('Latest useful packet saved');
+      window.setTimeout(() => setCopied(null), 1400);
+    }).catch(() => {});
   }
 
   function reflectPacketToContextPack(entry: PacketHistoryEntry) {
@@ -239,11 +267,12 @@ export default function App() {
     window.setTimeout(() => setCopied(null), 1400);
   }
   function clearPacketHistory() {
-    setProjects((current) =>
+    void persist((current) =>
       current.map((project) => (project.id === activeProject.id ? { ...project, packetHistory: [] } : project))
-    );
-    setCopied('Packet history cleared');
-    window.setTimeout(() => setCopied(null), 1400);
+    ).then(() => {
+      setCopied('Packet history cleared');
+      window.setTimeout(() => setCopied(null), 1400);
+    }).catch(() => {});
   }
   async function copyPrompt(label: string, text: string) {
     await navigator.clipboard.writeText(text);
@@ -252,7 +281,13 @@ export default function App() {
   }
 
   function exportBackup() {
-    const backupText = createBackupText(projects);
+    let backupText;
+    try {
+      backupText = createBackupText(readStoredProjects(localStorage, starterProjects));
+    } catch {
+      setBackupStatus('保存済みデータを読み取れないため、書き出しを中止しました。');
+      return;
+    }
     const backupUrl = URL.createObjectURL(new Blob([backupText], { type: 'application/json' }));
     const link = document.createElement('a');
     link.href = backupUrl;
@@ -284,9 +319,15 @@ export default function App() {
     if (!file) return;
 
     try {
+      const before = JSON.stringify(projects);
       const restoredProjects = restoreBackupText(await file.text());
-      setProjects(restoredProjects);
-      setActiveProjectId(restoredProjects[0]?.id ?? starterProjects[0].id);
+      await persist((latest) => {
+        if (JSON.stringify(latest) !== before) {
+          throw new Error('別の更新があるため、バックアップの復元を中止しました。');
+        }
+        return restoredProjects;
+      }, false);
+      setActiveProjectId(restoredProjects[0].id);
       setBackupStatus('バックアップから復元しました。');
     } catch {
       setBackupStatus('復元できませんでした。cockpit backup JSONを選んでください。');
@@ -343,7 +384,7 @@ export default function App() {
               placeholder="いま進めたい作業"
             />
           </label>
-          <div className="saved-pill">Saved locally</div>
+          <div className="saved-pill" aria-live="polite">{storageStatus}</div>
         </header>
 
         <section className="goal-band">

@@ -14,10 +14,11 @@ export function WorkshopReceiptPanel({
   receipts, onSave
 }: {
   receipts: WorkshopReceipt[];
-  onSave: (receipt: WorkshopReceipt) => void;
+  onSave: (receipt: WorkshopReceipt, expected?: WorkshopReceipt) => Promise<void>;
 }) {
   const [message, setMessage] = useState('');
   const [editing, setEditing] = useState<WorkshopReceipt | null>(null);
+  const [saving, setSaving] = useState(false);
   const editor = useRef<HTMLDetailsElement>(null);
   const runIdInput = useRef<HTMLInputElement>(null);
 
@@ -27,8 +28,23 @@ export function WorkshopReceiptPanel({
     runIdInput.current?.focus();
   }, [editing]);
 
-  function save(event: FormEvent<HTMLFormElement>) {
+  async function persistReceipt(receipt: WorkshopReceipt, expected?: WorkshopReceipt) {
+    setSaving(true);
+    try {
+      await onSave(receipt, expected);
+      setMessage('結果票をこのプロジェクトに保存しました。');
+      return true;
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : '結果票の保存を中止しました。');
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saving) return;
     const form = event.currentTarget;
     const data = new FormData(form);
     const field = (name: string) => String(data.get(name) ?? '').trim();
@@ -42,10 +58,9 @@ export function WorkshopReceiptPanel({
       setMessage('入力を確認してください。PRとCIには、該当するGitHubのURLを入力してください。');
       return;
     }
-    onSave(receipt);
+    if (!await persistReceipt(receipt, editing ?? undefined)) return;
     form.reset();
     setEditing(null);
-    setMessage('結果票をこのプロジェクトに保存しました。');
   }
 
   return (
@@ -59,7 +74,7 @@ export function WorkshopReceiptPanel({
         <article className="workshop-receipt" key={receipt.runId}>
           <header className="workshop-receipt-heading">
             <h3>{receipt.task}</h3>
-            <button className="workshop-receipt-button" type="button" aria-label={`${receipt.task} の結果票を編集`}
+            <button className="workshop-receipt-button" type="button" disabled={saving} aria-label={`${receipt.task} の結果票を編集`}
               onClick={() => setEditing(receipt)}>編集</button>
           </header>
           <dl>
@@ -74,10 +89,8 @@ export function WorkshopReceiptPanel({
         </article>
       ))}
       {!receipts.some(({ runId }) => runId === firstWorkshopReceipt.runId) && (
-        <button className="workshop-receipt-button" type="button" onClick={() => {
-          onSave(firstWorkshopReceipt);
-          setMessage('M0.1の実行記録を追加しました。');
-        }}>M0.1の実行記録を追加</button>
+        <button className="workshop-receipt-button" type="button" disabled={saving}
+          onClick={() => void persistReceipt(firstWorkshopReceipt)}>M0.1の実行記録を追加</button>
       )}
       <details ref={editor}>
         <summary>{editing ? '結果票を編集' : '結果票を記録'}</summary>
@@ -98,8 +111,8 @@ export function WorkshopReceiptPanel({
           </select></label>
           <label>PR URL<input name="prUrl" type="url" maxLength={350} defaultValue={editing?.prUrl} /></label>
           <label>CI URL<input name="ciUrl" type="url" maxLength={350} defaultValue={editing?.ciUrl} /></label>
-          <button className="workshop-receipt-button" type="submit">結果票を保存</button>
-          {editing && <button className="workshop-receipt-button" type="button" onClick={() => setEditing(null)}>編集をキャンセル</button>}
+          <button className="workshop-receipt-button" type="submit" disabled={saving}>結果票を保存</button>
+          {editing && <button className="workshop-receipt-button" type="button" disabled={saving} onClick={() => setEditing(null)}>編集をキャンセル</button>}
         </form>
       </details>
       <p role="status">{message}</p>
