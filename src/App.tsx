@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createBackupText, restoreBackupText } from './backup';
+import { WorkshopReceiptPanel } from './WorkshopReceiptPanel';
+import { firstWorkshopReceipt, isWorkshopReceipt, type WorkshopReceipt } from './workshopReceipts';
 import {
   buildGoalMakerPrompt,
   buildPlanPrompt,
@@ -47,6 +49,7 @@ type CockpitProject = Project & {
   id: string;
   task: CockpitTask;
   packetHistory?: PacketHistoryEntry[];
+  workshopReceipts?: WorkshopReceipt[];
 };
 
 const storageKey = 'madowaku-codex-cockpit-v0-1';
@@ -67,7 +70,8 @@ const starterProjects: CockpitProject[] = [
     id: 'madowaku-local',
     name: 'Madowaku Local Lab',
     description: 'Creative coding projects, Codex planning, and verification prep.',
-    task: emptyTask
+    task: emptyTask,
+    workshopReceipts: [firstWorkshopReceipt]
   }
 ];
 
@@ -94,6 +98,10 @@ function loadProjects() {
   } catch {
     return starterProjects;
   }
+}
+
+function receiptsFor(project: CockpitProject) {
+  return Array.isArray(project.workshopReceipts) ? project.workshopReceipts.filter(isWorkshopReceipt) : [];
 }
 
 export default function App() {
@@ -182,6 +190,12 @@ export default function App() {
         project.id === activeProject.id ? { ...project, task: { ...project.task, ...patch } } : project
       )
     );
+  }
+
+  function saveWorkshopReceipt(receipt: WorkshopReceipt) {
+    setProjects((current) => current.map((project) => project.id === activeProject.id
+      ? { ...project, workshopReceipts: [receipt, ...receiptsFor(project).filter(({ runId }) => runId !== receipt.runId)] }
+      : project));
   }
 
   function addProject() {
@@ -545,6 +559,7 @@ export default function App() {
             onChange={(golden) => updateTask({ golden })}
           />
           <NoteField label="Logs" value={activeProject.task.logs} onChange={(logs) => updateTask({ logs })} tall />
+          <WorkshopReceiptPanel key={activeProject.id} receipts={receiptsFor(activeProject)} onSave={saveWorkshopReceipt} />
           <section className="trace-actions" aria-label="TRACE reflection">
             <div>
               <span>TRACE化</span>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createBackupText, restoreBackupText } from './backup';
 import type { CockpitTask } from './promptBuilders';
+import { firstWorkshopReceipt } from './workshopReceipts';
 
 const task: CockpitTask = {
   title: 'Ship tiny cockpit',
@@ -112,5 +113,32 @@ describe('backup helpers', () => {
 
     expect(restoreBackupText(backupText)[0].packetHistory?.[0].summary).toContain('Ship tiny cockpit');
     expect(() => restoreBackupText(invalid)).toThrow('Invalid cockpit backup');
+  });
+
+  it('preserves recorded and unknown workshop results without changing Logs or Review', () => {
+    const pendingReceipt = {
+      ...firstWorkshopReceipt, runId: 'other-run', state: 'unknown' as const,
+      elapsedSeconds: null, prUrl: '', ci: 'unknown' as const, ciUrl: '', applyMode: 'unknown' as const
+    };
+    const project = { id: 'local-lab', name: 'Local Lab', description: '', task };
+    const receipts = [firstWorkshopReceipt, pendingReceipt];
+
+    expect(restoreBackupText(createBackupText([project]))[0]).toEqual(project);
+    expect(restoreBackupText(createBackupText([{ ...project, workshopReceipts: receipts }]))[0])
+      .toEqual({ ...project, workshopReceipts: receipts });
+  });
+
+  it('rejects invalid workshop run data and untrusted evidence URLs in backups', () => {
+    const project = { id: 'local-lab', name: 'Local Lab', description: '', task };
+    for (const invalid of [
+      { ...firstWorkshopReceipt, runId: ' ' },
+      { ...firstWorkshopReceipt, elapsedSeconds: -1 },
+      { ...firstWorkshopReceipt, prUrl: 'javascript:alert(1)' },
+      { ...firstWorkshopReceipt, ciUrl: 'https://github.com.example.test/x/y/actions/runs/1' },
+      { ...firstWorkshopReceipt, ciUrl: 'https://github.com/x/y/actions/runs/1?credential=example' }
+    ]) {
+      expect(() => restoreBackupText(createBackupText([{ ...project, workshopReceipts: [invalid] }])))
+        .toThrow('Invalid cockpit backup');
+    }
   });
 });
