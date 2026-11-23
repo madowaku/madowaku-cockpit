@@ -1,5 +1,6 @@
 import type { CockpitTask, PacketHistoryEntry, TaskMood, TaskStatus } from './promptBuilders';
 import { isWorkshopReceipt, type WorkshopReceipt } from './workshopReceipts';
+import { isStudioRecord, type StudioRecord } from './studio';
 
 export type BackupProject = {
   id: string;
@@ -8,6 +9,7 @@ export type BackupProject = {
   task: CockpitTask;
   packetHistory?: PacketHistoryEntry[];
   workshopReceipts?: WorkshopReceipt[];
+  studio?: StudioRecord;
 };
 
 type BackupPayload = {
@@ -60,6 +62,7 @@ function isBackupProject(value: unknown): value is BackupProject {
     typeof value.id === 'string' &&
     typeof value.name === 'string' &&
     typeof value.description === 'string' &&
+    (value.studio === undefined || isStudioRecord(value.studio)) &&
     (value.workshopReceipts === undefined ||
       (Array.isArray(value.workshopReceipts) && value.workshopReceipts.every(isWorkshopReceipt) &&
         new Set(value.workshopReceipts.map((receipt) => receipt.runId)).size === value.workshopReceipts.length)) &&
