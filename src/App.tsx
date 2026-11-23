@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { assertBackupPreservesReceiptEvidence, createBackupText, restoreBackupText } from './backup';
+import { createBackupText, restoreBackupText } from './backup';
 import { accessProjects, projectStorageKey, readStoredProjects, setWorkshopReceipt, type ProjectChange } from './projectStorage';
 import { WorkshopReceiptPanel } from './WorkshopReceiptPanel';
 import { firstWorkshopReceipt, isWorkshopReceipt, type WorkshopReceipt } from './workshopReceipts';
+import { assertBackupPreservesReceiptEvidence } from './backup';
 import {
   buildGoalMakerPrompt,
   buildPlanPrompt,
