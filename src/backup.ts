@@ -1,4 +1,5 @@
 import type { CockpitTask, PacketHistoryEntry, TaskMood, TaskStatus } from './promptBuilders';
+import { isWorkshopReceipt, type WorkshopReceipt } from './workshopReceipts';
 
 export type BackupProject = {
   id: string;
@@ -6,6 +7,7 @@ export type BackupProject = {
   description: string;
   task: CockpitTask;
   packetHistory?: PacketHistoryEntry[];
+  workshopReceipts?: WorkshopReceipt[];
 };
 
 type BackupPayload = {
@@ -41,9 +43,30 @@ export function restoreBackupText(backupText: string) {
   }
 }
 
+// A legacy backup can omit receipts. This restore replaces projects wholesale.
+export function assertBackupPreservesReceiptEvidence(current: BackupProject[], incoming: BackupProject[]) {
+  const projects = new Map(incoming.map((project) => [project.id, project]));
+  for (const project of current) {
+    const receipts = new Map(projects.get(project.id)?.workshopReceipts?.map((receipt) => [receipt.runId, receipt]));
+    for (const receipt of project.workshopReceipts ?? []) {
+      const next = receipts.get(receipt.runId);
+      if ((receipt.prUrl && receipt.prUrl !== next?.prUrl) ||
+          (receipt.ciUrl && receipt.ciUrl !== next?.ciUrl) ||
+          (receipt.ci !== 'unknown' && receipt.ci !== next?.ci)) {
+        throw new Error('現在の結果票のPR・CI記録が失われるため、復元を中止しました。結果票を含むバックアップを選んでください。');
+      }
+    }
+  }
+}
+
 function isBackupPayload(value: unknown): value is BackupPayload {
   if (!isRecord(value)) return false;
-  return value.version === 1 && Array.isArray(value.projects) && value.projects.every(isBackupProject);
+  return value.version === 1 && isProjectCollection(value.projects);
+}
+
+export function isProjectCollection(value: unknown): value is BackupProject[] {
+  return Array.isArray(value) && value.length > 0 && value.every(isBackupProject) &&
+    new Set(value.map((project) => project.id)).size === value.length;
 }
 
 function isBackupProject(value: unknown): value is BackupProject {
@@ -53,6 +76,9 @@ function isBackupProject(value: unknown): value is BackupProject {
     typeof value.id === 'string' &&
     typeof value.name === 'string' &&
     typeof value.description === 'string' &&
+    (value.workshopReceipts === undefined ||
+      (Array.isArray(value.workshopReceipts) && value.workshopReceipts.every(isWorkshopReceipt) &&
+        new Set(value.workshopReceipts.map((receipt) => receipt.runId)).size === value.workshopReceipts.length)) &&
     (value.packetHistory === undefined || (Array.isArray(value.packetHistory) && value.packetHistory.length <= 5 && value.packetHistory.every(isPacketHistoryEntry))) &&
     typeof value.task.title === 'string' &&
     typeof value.task.roughGoal === 'string' &&

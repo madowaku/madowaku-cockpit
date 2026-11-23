@@ -12,7 +12,6 @@
 
 body {
   margin: 0;
-  min-width: 320px;
   min-height: 100vh;
   background:
     linear-gradient(90deg, rgba(57, 105, 93, 0.08) 1px, transparent 1px),
@@ -854,6 +853,86 @@ textarea {
 
 .notes-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.workshop-receipts {
+  grid-column: 1 / -1;
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 2px solid #d8c7a4;
+  border-radius: 8px;
+  background: #fffaf0;
+}
+
+.workshop-receipts h2, .workshop-receipts h3, .workshop-receipts p {
+  margin: 0;
+}
+
+.workshop-receipts h2 { font-size: 1.125rem; }
+.workshop-receipts h3 { font-size: 1rem; overflow-wrap: anywhere; }
+.workshop-receipts p { color: #5e5547; }
+.workshop-receipts header p { margin-top: 4px; }
+.workshop-receipts [role="status"]:empty { display: none; }
+
+.workshop-receipt {
+  padding: 12px;
+  border: 1px solid #d8c7a4;
+  border-radius: 8px;
+  background: #fffdf8;
+}
+
+.workshop-receipt-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workshop-receipt-heading button { flex-shrink: 0; }
+
+.workshop-receipt dl, .workshop-receipt-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 10px 0 0;
+}
+
+.workshop-receipt dt { color: #5e5547; font-size: 0.875rem; }
+.workshop-receipt dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+.workshop-receipt a { color: #155c4d; text-underline-offset: 0.18em; }
+.workshop-receipt code { font-size: 0.875rem; }
+.workshop-run-id, .workshop-task-input { grid-column: 1 / -1; }
+
+.workshop-receipts summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 10px 0;
+  font-weight: 700;
+}
+
+.workshop-receipt-form label { display: grid; gap: 4px; min-width: 0; }
+.workshop-receipt-form input, .workshop-receipt-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 1rem;
+}
+
+.workshop-receipt-button {
+  justify-self: start;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #155c4d;
+  border-radius: 8px;
+  color: #155c4d;
+  background: #fffdf8;
+  font-weight: 700;
+}
+
+@media (max-width: 520px) {
+  .workshop-receipt dl, .workshop-receipt-form { grid-template-columns: 1fr; }
 }
 
 .template-shelf {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { createBackupText, restoreBackupText } from './backup';
+import { assertBackupPreservesReceiptEvidence, createBackupText, restoreBackupText } from './backup';
 import type { CockpitTask } from './promptBuilders';
+import { firstWorkshopReceipt } from './workshopReceipts';
 
 const task: CockpitTask = {
   title: 'Ship tiny cockpit',
@@ -14,6 +15,30 @@ const task: CockpitTask = {
 };
 
 describe('backup helpers', () => {
+  it('rejects duplicate project IDs without rejecting older distinct projects', () => {
+    const first = { id: 'local-lab', name: 'Local Lab', description: '', task };
+    const second = { ...first, name: 'Second Lab' };
+    expect(() => restoreBackupText(createBackupText([first, second]))).toThrow('Invalid cockpit backup');
+    expect(restoreBackupText(createBackupText([first, { ...second, id: 'second' }])).map(({ id }) => id))
+      .toEqual(['local-lab', 'second']);
+  });
+
+  it('rejects a legacy restore that omits or replaces recorded PR or CI evidence', () => {
+    const project = { id: 'lab', name: 'Workshop', description: '', task };
+    const protectedProject = { ...project, workshopReceipts: [firstWorkshopReceipt] };
+    const moved = { ...protectedProject, id: 'another-project' };
+    const missingCi = { ...firstWorkshopReceipt, ci: 'unknown' as const, ciUrl: '' };
+    for (const input of [
+      [project], [{ ...project, workshopReceipts: [] }], [moved],
+      [{ ...project, workshopReceipts: [missingCi] }]
+    ]) {
+      const legacy = restoreBackupText(createBackupText(input));
+      expect(() => assertBackupPreservesReceiptEvidence([protectedProject], legacy)).toThrow('PR・CI記録');
+    }
+    expect(() => assertBackupPreservesReceiptEvidence([protectedProject], [protectedProject])).not.toThrow();
+    expect(() => assertBackupPreservesReceiptEvidence([project], [project])).not.toThrow();
+  });
+
   it('creates a versioned JSON backup for cockpit projects', () => {
     const backupText = createBackupText([
       {
@@ -112,5 +137,32 @@ describe('backup helpers', () => {
 
     expect(restoreBackupText(backupText)[0].packetHistory?.[0].summary).toContain('Ship tiny cockpit');
     expect(() => restoreBackupText(invalid)).toThrow('Invalid cockpit backup');
+  });
+
+  it('preserves recorded and unknown workshop results without changing Logs or Review', () => {
+    const pendingReceipt = {
+      ...firstWorkshopReceipt, runId: 'other-run', state: 'unknown' as const,
+      elapsedSeconds: null, prUrl: '', ci: 'unknown' as const, ciUrl: '', applyMode: 'unknown' as const
+    };
+    const project = { id: 'local-lab', name: 'Local Lab', description: '', task };
+    const receipts = [firstWorkshopReceipt, pendingReceipt];
+
+    expect(restoreBackupText(createBackupText([project]))[0]).toEqual(project);
+    expect(restoreBackupText(createBackupText([{ ...project, workshopReceipts: receipts }]))[0])
+      .toEqual({ ...project, workshopReceipts: receipts });
+  });
+
+  it('rejects invalid workshop run data and untrusted evidence URLs in backups', () => {
+    const project = { id: 'local-lab', name: 'Local Lab', description: '', task };
+    for (const invalid of [
+      { ...firstWorkshopReceipt, runId: ' ' },
+      { ...firstWorkshopReceipt, elapsedSeconds: -1 },
+      { ...firstWorkshopReceipt, prUrl: 'javascript:alert(1)' },
+      { ...firstWorkshopReceipt, ciUrl: 'https://github.com.example.test/x/y/actions/runs/1' },
+      { ...firstWorkshopReceipt, ciUrl: 'https://github.com/x/y/actions/runs/1?credential=example' }
+    ]) {
+      expect(() => restoreBackupText(createBackupText([{ ...project, workshopReceipts: [invalid] }])))
+        .toThrow('Invalid cockpit backup');
+    }
   });
 });
