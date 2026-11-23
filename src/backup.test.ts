@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createBackupText, restoreBackupText } from './backup';
+import { assertBackupPreservesReceiptEvidence, createBackupText, restoreBackupText } from './backup';
 import type { CockpitTask } from './promptBuilders';
 import { firstWorkshopReceipt } from './workshopReceipts';
 
@@ -21,6 +21,22 @@ describe('backup helpers', () => {
     expect(() => restoreBackupText(createBackupText([first, second]))).toThrow('Invalid cockpit backup');
     expect(restoreBackupText(createBackupText([first, { ...second, id: 'second' }])).map(({ id }) => id))
       .toEqual(['local-lab', 'second']);
+  });
+
+  it('rejects a legacy restore that omits or replaces recorded PR or CI evidence', () => {
+    const project = { id: 'lab', name: 'Workshop', description: '', task };
+    const protectedProject = { ...project, workshopReceipts: [firstWorkshopReceipt] };
+    const moved = { ...protectedProject, id: 'another-project' };
+    const missingCi = { ...firstWorkshopReceipt, ci: 'unknown' as const, ciUrl: '' };
+    for (const input of [
+      [project], [{ ...project, workshopReceipts: [] }], [moved],
+      [{ ...project, workshopReceipts: [missingCi] }]
+    ]) {
+      const legacy = restoreBackupText(createBackupText(input));
+      expect(() => assertBackupPreservesReceiptEvidence([protectedProject], legacy)).toThrow('PR・CI記録');
+    }
+    expect(() => assertBackupPreservesReceiptEvidence([protectedProject], [protectedProject])).not.toThrow();
+    expect(() => assertBackupPreservesReceiptEvidence([project], [project])).not.toThrow();
   });
 
   it('creates a versioned JSON backup for cockpit projects', () => {

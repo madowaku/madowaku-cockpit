@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { createBackupText, restoreBackupText } from './backup';
+import { assertBackupPreservesReceiptEvidence, createBackupText, restoreBackupText } from './backup';
 import { accessProjects, projectStorageKey, readStoredProjects, setWorkshopReceipt, type ProjectChange } from './projectStorage';
 import { WorkshopReceiptPanel } from './WorkshopReceiptPanel';
 import { firstWorkshopReceipt, isWorkshopReceipt, type WorkshopReceipt } from './workshopReceipts';
@@ -358,12 +358,14 @@ export default function App() {
         if (JSON.stringify(latest) !== before) {
           throw new Error('別の更新があるため、バックアップの復元を中止しました。');
         }
+        assertBackupPreservesReceiptEvidence(latest, restoredProjects);
         return restoredProjects;
       }, false);
       setActiveProjectId(restoredProjects[0].id);
       setBackupStatus('バックアップから復元しました。');
-    } catch {
-      setBackupStatus('復元できませんでした。cockpit backup JSONを選んでください。');
+    } catch (error) {
+      setBackupStatus(error instanceof Error && error.message !== 'Invalid cockpit backup'
+        ? error.message : '復元できませんでした。cockpit backup JSONを選んでください。');
     } finally {
       if (importInputRef.current) {
         importInputRef.current.value = '';

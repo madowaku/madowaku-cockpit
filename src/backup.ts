@@ -43,6 +43,22 @@ export function restoreBackupText(backupText: string) {
   }
 }
 
+// A legacy backup can omit receipts. This restore replaces projects wholesale.
+export function assertBackupPreservesReceiptEvidence(current: BackupProject[], incoming: BackupProject[]) {
+  const projects = new Map(incoming.map((project) => [project.id, project]));
+  for (const project of current) {
+    const receipts = new Map(projects.get(project.id)?.workshopReceipts?.map((receipt) => [receipt.runId, receipt]));
+    for (const receipt of project.workshopReceipts ?? []) {
+      const next = receipts.get(receipt.runId);
+      if ((receipt.prUrl && receipt.prUrl !== next?.prUrl) ||
+          (receipt.ciUrl && receipt.ciUrl !== next?.ciUrl) ||
+          (receipt.ci !== 'unknown' && receipt.ci !== next?.ci)) {
+        throw new Error('現在の結果票のPR・CI記録が失われるため、復元を中止しました。結果票を含むバックアップを選んでください。');
+      }
+    }
+  }
+}
+
 function isBackupPayload(value: unknown): value is BackupPayload {
   if (!isRecord(value)) return false;
   return value.version === 1 && isProjectCollection(value.projects);
