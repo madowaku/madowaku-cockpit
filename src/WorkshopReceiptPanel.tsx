@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState, type FormEvent } from 'react';
-import { confirmedReceiptChanges, workshopReceiptEdit } from './workshopReceiptEdit';
+import { confirmedReceiptChanges, updateReceiptPr, workshopReceiptEdit } from './workshopReceiptEdit';
 import {
   firstWorkshopReceipt, isWorkshopReceipt, readWorkshopTransfer, shareWorkshopReceipt,
   workshopApplyModes, workshopCiStates, workshopRunStates,
@@ -10,6 +10,29 @@ function duration(seconds: number | null) {
   if (seconds === null) return '未計測';
   const minutes = Math.floor(seconds / 60);
   return minutes ? `${minutes}分${seconds % 60}秒` : `${seconds}秒`;
+}
+
+function ReceiptEvidenceFields({ receipt }: { receipt?: WorkshopReceipt }) {
+  const [evidence, setEvidence] = useState({
+    prUrl: receipt?.prUrl ?? '', ci: receipt?.ci ?? 'unknown', ciUrl: receipt?.ciUrl ?? ''
+  });
+  return <>
+    <label>PR URL<input name="prUrl" type="url" maxLength={350} value={evidence.prUrl}
+      onChange={(event) => {
+        const prUrl = event.target.value;
+        setEvidence((current) => updateReceiptPr(current, prUrl));
+      }} /></label>
+    <label>CI結果<select name="ci" value={evidence.ci} onChange={(event) => {
+      const ci = event.target.value as WorkshopReceipt['ci'];
+      setEvidence((current) => ({ ...current, ci }));
+    }}>
+      {Object.entries(workshopCiStates).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+    </select></label>
+    <label>CI URL<input name="ciUrl" type="url" maxLength={350} value={evidence.ciUrl} onChange={(event) => {
+      const ciUrl = event.target.value;
+      setEvidence((current) => ({ ...current, ciUrl }));
+    }} /></label>
+  </>;
 }
 
 export function WorkshopReceiptPanel({
@@ -158,7 +181,7 @@ export function WorkshopReceiptPanel({
       )}
       <details ref={editor}>
         <summary>{editing ? '結果票を編集' : '結果票を記録'}</summary>
-        <p>未確認の欄は空欄または「未確認」のまま保存できます。</p>
+        <p>PR URLを変更するとCI欄を未確認に戻します。新しいPRのCIを確認してから入力してください。</p>
         <form key={edit.version} className="workshop-receipt-form" onSubmit={save} hidden={Boolean(approval)} inert={saving}>
           <label>実行ID<input name="runId" ref={runIdInput} required maxLength={200} defaultValue={editing?.runId} readOnly={Boolean(editing)} /></label>
           <label>担当AI<input name="agent" required maxLength={160} defaultValue={editing?.agent} /></label>
@@ -170,11 +193,7 @@ export function WorkshopReceiptPanel({
           <label>反映方法<select name="applyMode" defaultValue={editing?.applyMode ?? 'unknown'}>
             {Object.entries(workshopApplyModes).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select></label>
-          <label>CI結果<select name="ci" defaultValue={editing?.ci ?? 'unknown'}>
-            {Object.entries(workshopCiStates).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-          </select></label>
-          <label>PR URL<input name="prUrl" type="url" maxLength={350} defaultValue={editing?.prUrl} /></label>
-          <label>CI URL<input name="ciUrl" type="url" maxLength={350} defaultValue={editing?.ciUrl} /></label>
+          <ReceiptEvidenceFields receipt={editing} />
           <button className="workshop-receipt-button" type="submit">結果票を保存</button>
           {editing && <button className="workshop-receipt-button" type="button" onClick={cancelEdit}>編集をキャンセル</button>}
         </form>

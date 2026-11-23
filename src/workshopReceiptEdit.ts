@@ -1,4 +1,4 @@
-import { workshopApplyModes, workshopCiStates, workshopRunStates, type WorkshopReceipt } from './workshopReceipts';
+import { sameWorkshopEvidenceUrl, workshopApplyModes, workshopCiStates, workshopRunStates, type WorkshopReceipt } from './workshopReceipts';
 
 type EvidenceChange = { label: string; before: string; after: string };
 
@@ -28,6 +28,13 @@ export function workshopReceiptEdit(state: WorkshopReceiptEdit, action: Action):
   }
 }
 
+type ReceiptEvidence = Pick<WorkshopReceipt, 'prUrl' | 'ci' | 'ciUrl'>;
+
+export function updateReceiptPr(evidence: ReceiptEvidence, prUrl: string): ReceiptEvidence {
+  if (sameWorkshopEvidenceUrl(evidence.prUrl, prUrl)) return { ...evidence, prUrl };
+  return { prUrl, ci: 'unknown', ciUrl: '' };
+}
+
 export function confirmedReceiptChanges(previous: WorkshopReceipt | undefined, next: WorkshopReceipt): EvidenceChange[] {
   if (!previous) return [];
   const fields = [
@@ -43,6 +50,12 @@ export function confirmedReceiptChanges(previous: WorkshopReceipt | undefined, n
     { label: '反映方法', before: previous.applyMode === 'unknown' ? '' : workshopApplyModes[previous.applyMode],
       after: workshopApplyModes[next.applyMode] }
   ];
-  return fields.filter(({ before, after }) => before && before !== after)
-    .map((field) => ({ ...field, after: field.after || '未記録' }));
+  const prChanged = previous.prUrl !== next.prUrl;
+  const prEvidence = ['PR URL', 'CI URL', 'CI結果'];
+  return fields.filter(({ label, before, after }) => before !== after && (before || (prChanged && prEvidence.includes(label))))
+    .map((field) => ({
+      ...field,
+      before: field.before || (field.label === 'CI結果' ? workshopCiStates.unknown : '未記録'),
+      after: field.after || '未記録'
+    }));
 }

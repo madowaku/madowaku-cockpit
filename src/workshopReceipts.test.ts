@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { firstWorkshopReceipt, readWorkshopTransfer, shareWorkshopReceipt } from './workshopReceipts';
-import { confirmedReceiptChanges, workshopReceiptEdit } from './workshopReceiptEdit';
+import { confirmedReceiptChanges, updateReceiptPr, workshopReceiptEdit } from './workshopReceiptEdit';
 
 const t3Run = {
   threadId: 'mcp:6579044f-866e-454c-b38a-46e5f264e9a7',
@@ -74,6 +74,43 @@ describe('workshop receipt transfer', () => {
     const reopened = workshopReceiptEdit(cancelled, { type: 'open', draft: original, previous: original });
     expect(reopened.draft).toEqual(firstWorkshopReceipt);
     expect(reopened.approval).toBeUndefined();
+  });
+
+  it('clears prefilled CI on a manual PR change and previews all three actual changes', () => {
+    const original = firstWorkshopReceipt;
+    const prUrl = original.prUrl.replace('/24', '/25');
+    const edited = { ...original, ...updateReceiptPr(original, prUrl) };
+    expect(edited).toMatchObject({ prUrl, ci: 'unknown', ciUrl: '' });
+    expect(confirmedReceiptChanges(original, edited)).toEqual([
+      { label: 'PR URL', before: original.prUrl, after: prUrl },
+      { label: 'CI URL', before: original.ciUrl, after: '未記録' },
+      { label: 'CI結果', before: '成功', after: '未確認' }
+    ]);
+    expect(updateReceiptPr(original, original.prUrl + '/')).toMatchObject({ ci: 'passed', ciUrl: original.ciUrl });
+  });
+
+  it('never inherits missing or stale CI evidence when a shared receipt changes the PR', () => {
+    const original = firstWorkshopReceipt;
+    const prUrl = original.prUrl.replace('/24', '/25');
+    const stale = { ...original, prUrl };
+    for (const shared of [stale, { ...stale, ci: 'unknown' as const, ciUrl: '' }]) {
+      const next = readWorkshopTransfer(shareWorkshopReceipt(shared), [original])!;
+      expect(next).toMatchObject({ prUrl, ci: 'unknown', ciUrl: '', elapsedSeconds: original.elapsedSeconds });
+      expect(confirmedReceiptChanges(original, next).map(({ label }) => label)).toEqual(['PR URL', 'CI URL', 'CI結果']);
+    }
+    const ciUrl = prUrl + '/checks';
+    const explicit = readWorkshopTransfer(shareWorkshopReceipt({ ...stale, ciUrl }), [original]);
+    expect(explicit).toMatchObject({ prUrl, ci: 'passed', ciUrl });
+  });
+
+  it('includes newly supplied PR and CI values in the approval of an existing receipt', () => {
+    const original = firstWorkshopReceipt;
+    const previous = { ...original, prUrl: '', ci: 'unknown' as const, ciUrl: '' };
+    expect(confirmedReceiptChanges(previous, original)).toEqual([
+      { label: 'PR URL', before: '未記録', after: original.prUrl },
+      { label: 'CI URL', before: '未記録', after: original.ciUrl },
+      { label: 'CI結果', before: '未確認', after: '成功' }
+    ]);
   });
 
   it('copies only receipt fields and rejects invalid or oversized transfers', () => {

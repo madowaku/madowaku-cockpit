@@ -89,14 +89,24 @@ export function shareWorkshopReceipt(receipt: WorkshopReceipt) {
   return JSON.stringify({ schema: sharingSchema, receipt: receiptFields(receipt) }, null, 2);
 }
 
+export function sameWorkshopEvidenceUrl(left: string, right: string) {
+  const normalize = (url: string) => url.trim().replace(/\/$/, '').toLowerCase();
+  return normalize(left) === normalize(right);
+}
+
 function applySharedReceipt(receipt: WorkshopReceipt, existing?: WorkshopReceipt): WorkshopReceipt {
   if (!existing) return receiptFields(receipt);
-  const ci = receipt.ci === 'unknown' ? existing.ci : receipt.ci;
+  const prUrl = receipt.prUrl || existing.prUrl;
+  const prChanged = !sameWorkshopEvidenceUrl(prUrl, existing.prUrl);
+  const newCiUrl = receipt.ciUrl && !sameWorkshopEvidenceUrl(receipt.ciUrl, existing.ciUrl) ? receipt.ciUrl : '';
+  const ci = prChanged
+    ? (newCiUrl ? receipt.ci : 'unknown')
+    : (receipt.ci === 'unknown' ? existing.ci : receipt.ci);
   return {
     ...receiptFields(receipt),
-    prUrl: receipt.prUrl || existing.prUrl,
+    prUrl,
     ci,
-    ciUrl: receipt.ciUrl || (ci === existing.ci ? existing.ciUrl : ''),
+    ciUrl: prChanged ? newCiUrl : receipt.ciUrl || (ci === existing.ci ? existing.ciUrl : ''),
     elapsedSeconds: receipt.elapsedSeconds ?? existing.elapsedSeconds,
     state: receipt.state === 'unknown' ? existing.state : receipt.state,
     applyMode: receipt.applyMode === 'unknown' ? existing.applyMode : receipt.applyMode
