@@ -635,7 +635,8 @@ export default function App() {
             onChange={(golden) => updateTask({ golden })}
           />
           <NoteField label="Logs" value={activeProject.task.logs} onChange={(logs) => updateTask({ logs })} tall />
-          <WorkshopReceiptPanel key={activeProject.id} receipts={receiptsFor(activeProject)} onSave={saveWorkshopReceipt} />
+          <WorkshopReceiptPanel key={activeProject.id} receipts={receiptsFor(activeProject)}
+            onSave={saveWorkshopReceipt} handoff={prompts.creole} />
           <section className="trace-actions" aria-label="TRACE reflection">
             <div>
               <span>TRACE化</span>

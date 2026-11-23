@@ -892,6 +892,58 @@ textarea {
 
 .workshop-receipt-heading button { flex-shrink: 0; }
 
+.workshop-receipt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.workshop-receipt-approval {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #a57a26;
+  border-radius: 8px;
+  background: #fff5df;
+  overflow-wrap: anywhere;
+}
+
+.workshop-receipt-approval dl { display: grid; gap: 8px; }
+.workshop-receipt-approval dt { font-weight: 700; }
+.workshop-receipt-approval dd { margin-left: 0; }
+.workshop-receipt-form[hidden] { display: none; }
+
+.workshop-transfer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: start;
+}
+
+.workshop-transfer details {
+  min-width: 0;
+  padding: 0 12px 4px;
+  border: 1px solid #d8c7a4;
+  border-radius: 8px;
+  background: #f5eddb;
+}
+
+.workshop-transfer details[open] { padding-bottom: 12px; }
+.workshop-transfer p { overflow-wrap: anywhere; }
+.workshop-transfer textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 8px 0;
+  font-size: 1rem;
+}
+.workshop-transfer form { margin-top: 10px; }
+
+.workshop-transfer .workshop-transfer-primary {
+  color: #fffaf0;
+  background: #155c4d;
+}
+
 .workshop-receipt dl, .workshop-receipt-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -932,7 +984,8 @@ textarea {
 }
 
 @media (max-width: 520px) {
-  .workshop-receipt dl, .workshop-receipt-form { grid-template-columns: 1fr; }
+  .workshop-receipt dl, .workshop-receipt-form, .workshop-transfer { grid-template-columns: 1fr; }
+  .workshop-receipt-heading { flex-direction: column; gap: 8px; }
 }
 
 .template-shelf {
